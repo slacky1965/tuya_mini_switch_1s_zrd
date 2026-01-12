@@ -1,14 +1,6 @@
 #ifndef SRC_INCLUDE_APP_DEVICE_H_
 #define SRC_INCLUDE_APP_DEVICE_H_
 
-enum {
-    VK_SW1 = 0x01,
-    VK_SW2 = 0x02,
-    VK_SW_MAX
-};
-
-#define MAX_BUTTON_NUM  1
-
 #define DEVICE_EN(d)    (d?1:0)
 #define LED_ON(d)       (d?1:0)
 #define LED_OFF(d)      (d?1:0)
@@ -22,10 +14,10 @@ typedef enum {
     DEVICE_SWITCH_MAX
 } device_switch_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     uint32_t            gpio;
-    bool                input;
-    bool                output;
+    uint8_t             input;
+    uint8_t             output;
     GPIO_FuncTypeDef    func;
     GPIO_PullTypeDef    pull;
 } device_gpio_t;

@@ -17,7 +17,9 @@ typedef struct {
     uint8_t     state;
 } button_t;
 
+
 void button_handler(void);
 u8 button_idle();
+void kb_drv_init();
 
 #endif /* SRC_INCLUDE_APP_BUTTON_H_ */

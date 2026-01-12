@@ -29,11 +29,19 @@
 #include "app_types.h"
 
 #ifndef MCU_CORE_8258
-    #define MCU_CORE_8258       1
+    #define MCU_CORE_8258   1
 #endif
 
-#define ON                      1
-#define OFF                     0
+#define ON                  1
+#define OFF                 0
+
+enum {
+    VK_SW1 = 0x01,
+    VK_SW2 = 0x02,
+    VK_SW_MAX
+};
+
+#define KB_MAP_NORMAL       {{VK_SW1,}}
 
 /* for reporting */
 #define REPORTING_MIN       60              /* 1 min            */

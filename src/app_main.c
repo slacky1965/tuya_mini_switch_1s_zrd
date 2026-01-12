@@ -136,8 +136,10 @@ void user_app_init(void)
 
 void app_task(void) {
 
-    button_handler();
-    switch_handler();
+    if (cur_device->device_en) {
+        button_handler();
+        switch_handler();
+    }
 
     if (BDB_STATE_GET() == BDB_STATE_IDLE && !button_idle() && !switch_idle()) {
         report_handler();
@@ -175,6 +177,7 @@ void user_init(bool isRetention)
     (void)isRetention;
 
     device_init();
+    kb_drv_init();
 
     /* Initialize LEDs*/
     light_init();

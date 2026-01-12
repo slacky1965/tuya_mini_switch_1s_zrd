@@ -44,7 +44,7 @@ static void check_first_start(uint8_t i) {
 
 void set_relay_status(uint8_t i, uint8_t status) {
 //    printf("set_relay_status(i = %d, status = %d). GPIO: %d\r\n", i, status, dev_relay.unit_relay[i].rl);
-    drv_gpio_write(dev_relay.unit_relay[i].rl, status);
+    if (cur_device->device_en) drv_gpio_write(dev_relay.unit_relay[i].rl, status);
 }
 
 static void print_setting_sr(nv_sts_t st, relay_settings_t *relay_settings_tmp, bool save) {

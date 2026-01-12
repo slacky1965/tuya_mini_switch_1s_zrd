@@ -34,7 +34,7 @@ typedef struct{
 
     bool net_steer_start;
 
-    button_t button[MAX_BUTTON_NUM];
+    button_t button;
     u8  keyPressed;
 
     uint16_t ledOnTime;
