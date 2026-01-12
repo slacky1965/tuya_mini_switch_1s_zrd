@@ -174,6 +174,8 @@ void user_init(bool isRetention)
 {
     (void)isRetention;
 
+    device_init();
+
     /* Initialize LEDs*/
     light_init();
 

@@ -9,10 +9,10 @@
 #include "gp.h"
 
 
+#include "app_device.h"
 #include "app_relay.h"
 #include "app_onoff.h"
 #include "app_switch.h"
-#include "app_bootloader.h"
 #include "zcl_onoffSwitchCfg.h"
 #include "app_reporting.h"
 #include "app_endpoint_cfg.h"
