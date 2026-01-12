@@ -104,7 +104,7 @@
  *
  */
 
-#define IMAGE_TYPE_APP          (BOARD | (IMAGE_TYPE_BOOT_FLAG << 7))
+#define IMAGE_TYPE_APP          (0x25 | (IMAGE_TYPE_BOOT_FLAG << 7))
 
 /*********************************************************************************************
  * During OTA upgrade, the upgraded device will check the rules of the following three fields.

@@ -15,10 +15,10 @@ void cmdOnOff_toggle(uint8_t ep) {
     if (pOnOff->startUpOnOff != ZCL_START_UP_ONOFF_SET_ONOFF_TO_OFF && pOnOff->startUpOnOff != ZCL_START_UP_ONOFF_SET_ONOFF_TO_ON) {
         relay_settings_save();
     }
-    uint8_t status = RELAY_OFF;
+    uint8_t status = RELAY_OFF(cur_device->relay_off);
 
     if (pOnOff->onOff) {
-        status = RELAY_ON;
+        status = RELAY_ON(cur_device->relay_on);
     }
 
     set_relay_status(i, status);
@@ -38,7 +38,7 @@ void cmdOnOff_on(uint8_t ep) {
     if (pOnOff->startUpOnOff != ZCL_START_UP_ONOFF_SET_ONOFF_TO_OFF && pOnOff->startUpOnOff != ZCL_START_UP_ONOFF_SET_ONOFF_TO_ON) {
         relay_settings_save();
     }
-    uint8_t status = RELAY_ON;
+    uint8_t status = RELAY_ON(cur_device->relay_on);
 
     set_relay_status(i, status);
 }
@@ -57,7 +57,7 @@ void cmdOnOff_off(uint8_t ep) {
     if (pOnOff->startUpOnOff != ZCL_START_UP_ONOFF_SET_ONOFF_TO_OFF && pOnOff->startUpOnOff != ZCL_START_UP_ONOFF_SET_ONOFF_TO_ON) {
         relay_settings_save();
     }
-    uint8_t status = RELAY_OFF;
+    uint8_t status = RELAY_OFF(cur_device->relay_off);
 
     set_relay_status(i, status);
 }

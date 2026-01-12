@@ -135,8 +135,8 @@ nv_sts_t relay_settings_restore() {
 void dev_relay_init() {
     dev_relay.amt = AMT_RELAY;
     dev_relay.unit_relay[0].ep = APP_ENDPOINT1;
-    dev_relay.unit_relay[0].sw = SWITCH1_GPIO;
-    dev_relay.unit_relay[0].rl = RELAY1_GPIO;
+    dev_relay.unit_relay[0].sw = cur_device->switch_gpio.gpio; //SWITCH1_GPIO;
+    dev_relay.unit_relay[0].rl = cur_device->relay_gpio.gpio; //RELAY1_GPIO;
 
     if (relay_settings.switchType[0] == ZCL_SWITCH_TYPE_MULTIFUNCTION) {
         check_first_start(0);

@@ -1,22 +1,8 @@
 # Set Project Name
-PROJECT_NAME ?= tuya_mini_switch_0x25_zrd
-PROJECT_DEF ?= "-DBOARD=BOARD_ZG301Z"
+PROJECT_NAME = tuya_mini_switch_s1_zrd
 
 # Set the serial port number for downloading the firmware
 DOWNLOAD_PORT := COM3
-
-ifeq ($(PROJECT_NAME),tuya_mini_switch_0x25_zrd)
-	MANUF_CODE = 4417
-	IMAGE_TYPE = 513
-else
-	ifeq ($(PROJECT_NAME),ts0201_tz3000_0x26_zed)
-		MANUF_CODE = 4417
-		IMAGE_TYPE = 54179
-	else
-		MANUF_CODE = 4417
-		IMAGE_TYPE = 54179
-	endif
-endif
 
 COMPILE_OS = $(shell uname -o)
 LINUX_OS = GNU/Linux
@@ -41,7 +27,7 @@ LIBS := -lzb_router -ldrivers_8258 -lsoft-fp
 
 DEVICE_TYPE = -DROUTER=1
 MCU_TYPE = -DMCU_CORE_8258=1
-BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258 $(PROJECT_DEF)
+BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
 
 SDK_PATH := ./tl_zigbee_sdk
 SRC_PATH := ./src
@@ -101,8 +87,7 @@ endif
   
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
-$(MCU_TYPE) \
-$(PROJECT_DEF)
+$(MCU_TYPE)
 
 OBJ_SRCS := 
 S_SRCS := 
@@ -210,7 +195,7 @@ $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create zigbee OTA file'
 	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
 	@echo 'Create zigbee Tuya OTA file'
-	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -m $(MANUF_CODE) -i $(IMAGE_TYPE) -v0x1111114b -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -m 4417 -i 54179 -v0x1111114b -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
 	@echo ' '
 	@echo 'Finished building: $@'
 	@echo ' '
