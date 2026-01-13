@@ -58,7 +58,7 @@
 #include "version_cfg.h"
 
 /* Debug mode config */
-#define UART_PRINTF_MODE                ON
+#define UART_PRINTF_MODE                OFF
 #define DEBUG_SAVE	                    ON
 #define DEBUG_BUTTON                    ON
 #define DEBUG_SWITCH                    ON
