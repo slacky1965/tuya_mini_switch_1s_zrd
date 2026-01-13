@@ -35,14 +35,6 @@
 #define ON                  1
 #define OFF                 0
 
-enum {
-    VK_SW1 = 0x01,
-    VK_SW2 = 0x02,
-    VK_SW_MAX
-};
-
-#define KB_MAP_NORMAL       {{VK_SW1,}}
-
 /* for reporting */
 #define REPORTING_MIN       60              /* 1 min            */
 #define REPORTING_MAX       300             /* 5 min            */
@@ -56,6 +48,7 @@ enum {
  */
 
 #define ZCL_BASIC_MFG_NAME     {10,'S','l','a','c','k','y','-','D','I','Y'}
+#define ZCL_BASIC_MODEL_ID     {13,'T','S','M','1','-','0','0','2','5','-','S','l','D'}
 
 
 /**********************************************************************
@@ -65,7 +58,7 @@ enum {
 #include "version_cfg.h"
 
 /* Debug mode config */
-#define UART_PRINTF_MODE                OFF
+#define UART_PRINTF_MODE                ON
 #define DEBUG_SAVE	                    ON
 #define DEBUG_BUTTON                    ON
 #define DEBUG_SWITCH                    ON
@@ -75,6 +68,12 @@ enum {
 #define DEBUG_REPORTING                 OFF
 #define DEBUG_OTA                       OFF
 #define DEBUG_STA_STATUS                OFF
+
+#if UART_PRINTF_MODE
+#define DEBUG_INFO_TX_PIN       GPIO_PB1    //printf
+#define DEBUG_BAUDRATE          115200
+#endif /* UART_PRINTF_MODE */
+
 
 #define USB_PRINTF_MODE                 OFF
 
@@ -87,19 +86,6 @@ enum {
 /* BDB */
 #define TOUCHLINK_SUPPORT               ON
 #define FIND_AND_BIND_SUPPORT           OFF
-
-/* Board ID */
-#define BOARD_826x_EVK                  0
-#define BOARD_826x_DONGLE               1
-#define BOARD_826x_DONGLE_PA            2
-#define BOARD_8258_EVK                  3
-#define BOARD_8258_EVK_V1P2             4//C1T139A30_V1.2
-#define BOARD_8258_DONGLE               5
-#define BOARD_8278_EVK                  6
-#define BOARD_8278_DONGLE               7
-#define BOARD_B91_EVK                   8
-#define BOARD_B91_DONGLE                9
-#define BOARD_ZTLC9	                  	10
 
 /* Board define */
 #if defined(MCU_CORE_826x)
@@ -148,13 +134,6 @@ enum {
 #else
     #error "MCU is undefined!"
 #endif
-
-/* Board include */
-#if defined(BOARD)
-#include "board_zg301z.h"
-#include "board_jr_zds01.h"
-#endif
-
 
 /* Voltage detect module */
 /* If VOLTAGE_DETECT_ENABLE is set,
@@ -217,5 +196,16 @@ typedef enum{
     EV_POLL_IDLE,
     EV_POLL_MAX,
 }ev_poll_e;
+
+/**********************************************************************
+ * Keyboard configuration
+ */
+enum {
+    VK_SW1 = 0x01,
+    VK_SW2 = 0x02,
+    VK_SW_MAX
+};
+
+#define KB_MAP_NORMAL       {{VK_SW1,}}
 
 #endif /* SRC_INCLUDE_APP_CFG_H_ */

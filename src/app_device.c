@@ -2,6 +2,8 @@
 
 swt_device_t swt_device[DEVICE_SWITCH_MAX];
 
+device_switch_t device_type = DEVICE_SWITCH_NONE;
+
 swt_device_t *cur_device = &swt_device[DEVICE_SWITCH_1];
 
 static void device_gpio_init(device_gpio_t *device_gpio) {
@@ -14,6 +16,8 @@ static void device_gpio_init(device_gpio_t *device_gpio) {
 
 void device_init() {
     uint8_t devi = DEVICE_SWITCH_NONE;
+
+    memset(&swt_device, 0, sizeof(swt_device));
 
     /* None device */
     swt_device[devi++].device_en = OFF;

@@ -9,8 +9,8 @@
 
 typedef enum {
     DEVICE_SWITCH_NONE  = 0,
-    DEVICE_SWITCH_1,
-    DEVICE_SWITCH_2,
+    DEVICE_SWITCH_1,                        /* jr_zds01 Gerier _TZ3000_6axxqqi2 */
+    DEVICE_SWITCH_2,                        /* zg301z Hobean                    */
     DEVICE_SWITCH_MAX
 } device_switch_t;
 
