@@ -343,5 +343,8 @@ int kb_is_data_same(kb_data_t *a, kb_data_t *b)
 
 void kb_drv_init() {
     drive_pins[0] = NULL;   //8
-    scan_pins[0] = cur_device->button_gpio.gpio;     //18
+    scan_pins[0] = device->button_gpio.gpio;     //18
+    kb_event.cnt = 0;
+    kb_event.ctrl_key = 0;
+    kb_is_fn_pressed = 0;
 }

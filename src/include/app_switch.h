@@ -14,5 +14,6 @@ typedef enum {
 
 void switch_handler();
 bool switch_idle();
+void switch_init();
 
 #endif /* SRC_INCLUDE_APP_SWITCH_H_ */

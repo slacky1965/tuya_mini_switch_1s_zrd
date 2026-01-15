@@ -1,0 +1,105 @@
+#include "app_main.h"
+
+#define DEBOUNCE_BUTTON     16                          /* number of polls for debounce       */
+#define COUNT_FACTORY_RESET 5                           /* number of clicks for factory reset */
+
+static button_t button;
+static ev_timer_event_t *timerFactoryResetLed = NULL;
+
+
+static int32_t net_steer_start_offCb(void *args) {
+
+    g_appCtx.net_steer_start = false;
+
+    light_blink_stop();
+
+    return -1;
+}
+
+static int32_t factoryResetLedCb(void *args) {
+    light_on();
+
+    timerFactoryResetLed = NULL;
+    return -1;
+}
+
+void button_handler() {
+
+    if (!drv_gpio_read(device->button_gpio.gpio)) {
+        if (button.debounce != DEBOUNCE_BUTTON) {
+            button.debounce++;
+            if (button.debounce == DEBOUNCE_BUTTON) {
+                button.pressed = true;
+                button.pressed_time = clock_time();
+                if (timerFactoryResetLed) {
+                    TL_ZB_TIMER_CANCEL(&timerFactoryResetLed);
+                }
+                timerFactoryResetLed = TL_ZB_TIMER_SCHEDULE(factoryResetLedCb, NULL, TIMEOUT_5SEC);
+                if (!clock_time_exceed(button.released_time, TIMEOUT_TICK_1SEC)) {
+                    button.counter++;
+                } else {
+                    button.counter = 1;
+                }
+            }
+        }
+    } else {
+        if (button.debounce != 1) {
+            button.debounce--;
+            if (button.debounce == 1 && button.pressed) {
+                button.released = true;
+                button.released_time = clock_time();
+                if (timerFactoryResetLed) {
+                    TL_ZB_TIMER_CANCEL(&timerFactoryResetLed);
+                }
+            }
+        }
+    }
+
+    if (button.pressed && button.released) {
+        button.pressed = button.released = false;
+        if (clock_time_exceed(button.pressed_time, TIMEOUT_TICK_5SEC)) {
+            /* long pressed > 5 sec. */
+#if UART_PRINTF_MODE && DEBUG_BUTTON
+            printf("The button was keep pressed for 5 seconds\r\n");
+#endif
+            zb_factoryReset();
+            g_appCtx.net_steer_start = true;
+            TL_ZB_TIMER_SCHEDULE(net_steer_start_offCb, NULL, TIMEOUT_1MIN30SEC);
+            light_blink_start(90, 250, 750);
+        } else { /* short single pressed < 5 sec. */
+            light_blink_start(1, 30, 30);
+#if UART_PRINTF_MODE && DEBUG_BUTTON
+            printf("Button push 1 time\r\n");
+#endif
+            cmdOnOff_toggle(APP_ENDPOINT1);
+        }
+    } else if (!button.pressed) {
+        if (clock_time_exceed(button.released_time, TIMEOUT_TICK_1SEC)) {
+            if (button.counter == 2) {
+            } else if (button.counter == 3) {
+            } else if (button.counter == 4) {
+            }
+            button.counter = 0;
+        }
+
+    }
+}
+
+u8 button_idle() {
+    if ((button.debounce != 1 && button.debounce != DEBOUNCE_BUTTON)
+            || button.pressed
+            || button.counter) {
+        return true;
+    }
+    return false;
+}
+
+void button_init() {
+
+    memset(&button, 0, sizeof(button_t));
+
+    button.debounce = 1;
+    button.released_time = clock_time();
+
+}
+

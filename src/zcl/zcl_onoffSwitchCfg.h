@@ -17,6 +17,7 @@
 
 #define CUSTOM_ATTRID_SWITCH_TYPE           0xF000
 #define CUSTOM_ATTRID_DECOUPLED             0xF001
+#define CUSTOM_ATTRID_DEVICE_MODEL          0xF002
 
 status_t zcl_onoffCfg_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 nv_sts_t zcl_onOffCfgAttr_save(void);

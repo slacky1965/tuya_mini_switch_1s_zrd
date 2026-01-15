@@ -2,16 +2,15 @@
 OUT_DIR += \
 /$(SRC_PATH) \
 /$(SRC_PATH)/common \
-/$(SRC_PATH)/drv_sdk \
 /$(SRC_PATH)/zcl
  
 OBJS += \
 $(OUT_PATH)/$(SRC_PATH)/common/main.o \
 $(OUT_PATH)/$(SRC_PATH)/common/flash.o \
 $(OUT_PATH)/$(SRC_PATH)/common/factory_reset.o \
-$(OUT_PATH)/$(SRC_PATH)/drv_sdk/drv_keyboard.o \
 $(OUT_PATH)/$(SRC_PATH)/zcl/zcl_reporting.o \
 $(OUT_PATH)/$(SRC_PATH)/zcl/zcl_onoffSwitchCfg.o \
+$(OUT_PATH)/$(SRC_PATH)/drv_sdk/drv_keyboard.o \
 $(OUT_PATH)/$(SRC_PATH)/zb_appCb.o \
 $(OUT_PATH)/$(SRC_PATH)/zcl_appCb.o \
 $(OUT_PATH)/$(SRC_PATH)/app_device.o \

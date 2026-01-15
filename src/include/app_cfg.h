@@ -58,7 +58,7 @@
 #include "version_cfg.h"
 
 /* Debug mode config */
-#define UART_PRINTF_MODE                OFF
+#define UART_PRINTF_MODE                ON
 #define DEBUG_SAVE	                    ON
 #define DEBUG_BUTTON                    ON
 #define DEBUG_SWITCH                    ON
@@ -70,7 +70,8 @@
 #define DEBUG_STA_STATUS                OFF
 
 #if UART_PRINTF_MODE
-#define DEBUG_INFO_TX_PIN       GPIO_PB1    //printf
+#define DEBUG_INFO_TX_PIN       GPIO_PD3    //printf for jr_zds01 Gerier _TZ3000_6axxqqi2
+//#define DEBUG_INFO_TX_PIN       GPIO_PB1    //printf for zg301z Hobean
 #define DEBUG_BAUDRATE          115200
 #endif /* UART_PRINTF_MODE */
 

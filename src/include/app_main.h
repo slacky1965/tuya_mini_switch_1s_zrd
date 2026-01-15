@@ -1,6 +1,8 @@
 #ifndef SRC_INCLUDE_APP_MAIN_H_
 #define SRC_INCLUDE_APP_MAIN_H_
 
+
+
 #include "tl_common.h"
 #include "zcl_include.h"
 #include "general/zcl_multistate_input.h"
@@ -16,10 +18,10 @@
 #include "zcl_onoffSwitchCfg.h"
 #include "app_reporting.h"
 #include "app_endpoint_cfg.h"
-#include "app_button.h"
 #include "app_led.h"
 #include "app_utility.h"
 #include "app_time.h"
+#include "app_button.h"
 
 
 typedef struct{
@@ -33,9 +35,6 @@ typedef struct{
     ev_timer_event_t *timerLedEvt;
 
     bool net_steer_start;
-
-    button_t button;
-    u8  keyPressed;
 
     uint16_t ledOnTime;
     uint16_t ledOffTime;

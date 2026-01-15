@@ -5,27 +5,27 @@
 
 void led_on(uint32_t pin)
 {
-    if (cur_device->device_en) drv_gpio_write(pin, LED_ON(cur_device->len_on));
+    if (device->device_en) drv_gpio_write(pin, LED_ON(device->len_on));
 }
 
 void led_off(uint32_t pin)
 {
-    if (cur_device->device_en) drv_gpio_write(pin, LED_OFF(cur_device->len_off));
+    if (device->device_en) drv_gpio_write(pin, LED_OFF(device->len_off));
 }
 
 void light_on(void)
 {
-    if (cur_device->device_en) led_on(cur_device->led_gpio.gpio);
+    if (device->device_en) led_on(device->led_gpio.gpio);
 }
 
 void light_off(void)
 {
-    if (cur_device->device_en) led_off(cur_device->led_gpio.gpio);
+    if (device->device_en) led_off(device->led_gpio.gpio);
 }
 
 void light_init(void)
 {
-    if (cur_device->device_en) led_off(cur_device->led_gpio.gpio);
+    if (device->device_en) led_off(device->led_gpio.gpio);
 
 }
 

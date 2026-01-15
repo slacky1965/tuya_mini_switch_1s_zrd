@@ -106,7 +106,7 @@ void user_app_init(void)
 	/* Register ZCL specific cluster information */
     zcl_register(APP_ENDPOINT1, APP_CB_CLUSTER_NUM1, (zcl_specClusterInfo_t *)g_appClusterList1);
 
-    dev_relay_init();
+//    dev_relay_init();
 
     #if ZCL_GP_SUPPORT
 	/* Initialize GP */
@@ -136,7 +136,9 @@ void user_app_init(void)
 
 void app_task(void) {
 
-    if (cur_device->device_en) {
+    factoryRst_handler();
+
+    if (device->device_en) {
         button_handler();
         switch_handler();
     }
@@ -176,11 +178,13 @@ void user_init(bool isRetention)
 {
     (void)isRetention;
 
+    factoryRst_init();
+
     device_init();
-    kb_drv_init();
+//    kb_drv_init();
 
     /* Initialize LEDs*/
-    light_init();
+//    light_init();
 
 //    factroyRst_init();
 

@@ -51,5 +51,7 @@ uint16_t reverse16(uint16_t in);
 uint8_t *print_str_zcl(uint8_t *str_zcl);
 void start_message();
 double nat_log(double x);
+uint8_t checksum(uint8_t *data, uint16_t length);
+int32_t net_steer_start_offCb(void *args);
 
 #endif /* SRC_INCLUDE_APP_UTILITY_H_ */
