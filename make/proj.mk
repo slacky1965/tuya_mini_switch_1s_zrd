@@ -7,6 +7,7 @@ OUT_DIR += \
 /proj/os
 
 #$(OUT_PATH)/proj/drivers/drv_keyboard.o \
+#$(OUT_PATH)/proj/drivers/drv_putchar.o \
  
 OBJS += \
 $(OUT_PATH)/proj/common/list.o \
@@ -22,7 +23,6 @@ $(OUT_PATH)/proj/drivers/drv_hw.o \
 $(OUT_PATH)/proj/drivers/drv_i2c.o \
 $(OUT_PATH)/proj/drivers/drv_nv.o \
 $(OUT_PATH)/proj/drivers/drv_pm.o \
-$(OUT_PATH)/proj/drivers/drv_putchar.o \
 $(OUT_PATH)/proj/drivers/drv_pwm.o \
 $(OUT_PATH)/proj/drivers/drv_security.o \
 $(OUT_PATH)/proj/drivers/drv_spi.o \

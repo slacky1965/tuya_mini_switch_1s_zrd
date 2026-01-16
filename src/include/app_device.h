@@ -35,6 +35,7 @@ typedef struct __attribute__((packed)) {
     device_gpio_t       switch_gpio;
     uint8_t             switch_debounce;
     device_gpio_t       relay_gpio;
+    device_gpio_t       debug_gpio;
 } switch_device_t;
 
 extern device_switch_model_t device_switch_model;

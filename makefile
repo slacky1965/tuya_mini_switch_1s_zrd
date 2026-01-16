@@ -48,6 +48,7 @@ INCLUDE_PATHS := \
 -I$(SDK_PATH)/platform \
 -I$(SDK_PATH)/proj/common \
 -I$(SDK_PATH)/proj \
+-I$(SDK_PATH)/proj/drivers \
 -I$(SDK_PATH)/platform \
 -I$(SDK_PATH)/platform/chip_8258 \
 -I$(SDK_PATH)/zigbee/common/includes \

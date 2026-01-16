@@ -70,8 +70,7 @@
 #define DEBUG_STA_STATUS                OFF
 
 #if UART_PRINTF_MODE
-#define DEBUG_INFO_TX_PIN       GPIO_PD3    //printf for jr_zds01 Gerier _TZ3000_6axxqqi2
-//#define DEBUG_INFO_TX_PIN       GPIO_PB1    //printf for zg301z Hobean
+#define DEBUG_INFO_TX_PIN       GPIO_PD1    //fake gpio for 32pin's chip
 #define DEBUG_BAUDRATE          115200
 #endif /* UART_PRINTF_MODE */
 

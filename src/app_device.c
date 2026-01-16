@@ -30,6 +30,10 @@ static void device_model_init() {
         device_gpio_init(&device->led_gpio);
         device_gpio_init(&device->switch_gpio);
         device_gpio_init(&device->relay_gpio);
+#if UART_PRINTF_MODE
+        device_gpio_init(&device->debug_gpio);
+        gpio_write(device->debug_gpio.gpio, 1);
+#endif
         light_init();
 //        light_off();
         dev_relay_init();
@@ -97,8 +101,14 @@ void device_init() {
     switch_device[devi].relay_gpio.gpio = GPIO_PD2;
     switch_device[devi].relay_gpio.input = ON;
     switch_device[devi].relay_gpio.output = ON;
+    switch_device[devi].relay_gpio.func = AS_GPIO;
     switch_device[devi].relay_on = 1;
     switch_device[devi].relay_off = 0;
+    switch_device[devi].debug_gpio.gpio = GPIO_PD3;
+    switch_device[devi].debug_gpio.input = OFF;
+    switch_device[devi].debug_gpio.output = ON;
+    switch_device[devi].debug_gpio.func = AS_GPIO;
+    switch_device[devi].debug_gpio.pull = PM_PIN_PULLUP_1M;
 
     devi++;
 
@@ -125,8 +135,14 @@ void device_init() {
     switch_device[devi].relay_gpio.gpio = GPIO_PA1;
     switch_device[devi].relay_gpio.input = ON;
     switch_device[devi].relay_gpio.output = ON;;
+    switch_device[devi].relay_gpio.func = AS_GPIO;
     switch_device[devi].relay_on = 1;
     switch_device[devi].relay_off = 0;
+    switch_device[devi].debug_gpio.gpio = UART_TX_PC2;
+    switch_device[devi].debug_gpio.input = OFF;
+    switch_device[devi].debug_gpio.output = ON;
+    switch_device[devi].debug_gpio.func = AS_GPIO;
+    switch_device[devi].debug_gpio.pull = PM_PIN_PULLUP_1M;
 
     device_model_restore();
 }
