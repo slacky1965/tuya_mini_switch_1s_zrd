@@ -4,6 +4,9 @@
 
 # TODO:
 
+<img src="doc/images/TSM1-SlD.png"/>
+
+
 [Наверх](#Top)
 
 
