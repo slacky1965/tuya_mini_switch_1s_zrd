@@ -202,8 +202,6 @@ typedef enum{
  */
 enum {
     VK_SW1 = 0x01,
-    VK_SW2 = 0x02,
-    VK_SW_MAX
 };
 
 #define KB_MAP_NORMAL       {{VK_SW1,}}
