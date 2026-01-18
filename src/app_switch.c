@@ -35,15 +35,6 @@ static app_switch_t app_switch_cfg[AMT_RELAY] = {
 
 static app_switch_t *app_switch = app_switch_cfg;
 
-static int32_t net_steer_start_offCb(void *args) {
-
-    g_appCtx.net_steer_start = false;
-
-    light_blink_stop();
-
-    return -1;
-}
-
 static void switch_factory_reset_start(void *args) {
 
 //    printf("Factory reset\r\n");
@@ -354,12 +345,12 @@ static void read_switch_multifunction(uint8_t i) {
 
 void switch_handler() {
 
-    for (uint8_t idx = 0; idx < AMT_RELAY; idx ++) {
-        if (relay_settings.switchType[idx] == ZCL_SWITCH_TYPE_MULTIFUNCTION) {
-            read_switch_multifunction(idx);
+    for (uint8_t i = 0; i < dev_relay.amt; i++) {
+        if (relay_settings.switchType[i] == ZCL_SWITCH_TYPE_MULTIFUNCTION) {
+            read_switch_multifunction(i);
         } else {
-//            test(idx);
-            read_switch_toggle(idx);
+//            test(i);
+            read_switch_toggle(i);
         }
     }
 
@@ -374,3 +365,19 @@ bool switch_idle() {
     return false;
 }
 
+void switch_init() {
+    for (uint8_t i = 0; i < dev_relay.amt; i++) {
+        app_switch[i].status = SWITCH_FLOAT;
+        app_switch[i].debounce = (DEBOUNCE_SWITCH / 2);
+        app_switch[i].hold = false;
+        app_switch[i].counter = 0;
+        ev_timer_event_t *timerEvt = app_switch[i].timerFrCounterEvt;
+        if (app_switch[i].timerFrCounterEvt) {
+            TL_ZB_TIMER_CANCEL(&timerEvt);
+        }
+        timerEvt = app_switch[i].timerMfCounterEvt;
+        if (app_switch[i].timerMfCounterEvt) {
+            TL_ZB_TIMER_CANCEL(&timerEvt);
+        }
+    }
+}

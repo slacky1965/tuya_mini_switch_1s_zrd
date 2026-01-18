@@ -244,3 +244,23 @@ void start_message() {
 #endif
 }
 
+uint8_t checksum(uint8_t *data, uint16_t length) {
+
+    uint8_t crc8 = 0;
+
+    for(uint8_t i = 0; i < length; i++) {
+        crc8 += data[i];
+    }
+
+    return crc8;
+}
+
+int32_t net_steer_start_offCb(void *args) {
+
+    g_appCtx.net_steer_start = false;
+
+    light_blink_stop();
+
+    return -1;
+}
+

@@ -10,9 +10,11 @@ $(OUT_PATH)/$(SRC_PATH)/common/flash.o \
 $(OUT_PATH)/$(SRC_PATH)/common/factory_reset.o \
 $(OUT_PATH)/$(SRC_PATH)/zcl/zcl_reporting.o \
 $(OUT_PATH)/$(SRC_PATH)/zcl/zcl_onoffSwitchCfg.o \
+$(OUT_PATH)/$(SRC_PATH)/drv_sdk/drv_keyboard.o \
+$(OUT_PATH)/$(SRC_PATH)/drv_sdk/drv_putchar.o \
 $(OUT_PATH)/$(SRC_PATH)/zb_appCb.o \
 $(OUT_PATH)/$(SRC_PATH)/zcl_appCb.o \
-$(OUT_PATH)/$(SRC_PATH)/app_bootloader.o \
+$(OUT_PATH)/$(SRC_PATH)/app_device.o \
 $(OUT_PATH)/$(SRC_PATH)/app_endpoint_cfg.o \
 $(OUT_PATH)/$(SRC_PATH)/app_reporting.o \
 $(OUT_PATH)/$(SRC_PATH)/app_utility.o \

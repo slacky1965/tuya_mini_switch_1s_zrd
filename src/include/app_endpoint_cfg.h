@@ -71,6 +71,7 @@ typedef struct {
     uint8_t switchActions;
     uint8_t custom_swtichType; // custom RW
     uint8_t custom_decoupled;
+    uint8_t custom_model;
 } zcl_onOffCfgAttr_t;
 
 /**

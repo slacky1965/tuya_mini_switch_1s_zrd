@@ -225,6 +225,12 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
                 }
                 relay_settings.switch_decoupled[idx] = decoupled;
                 save = true;
+            } else if (attr[i].attrID == CUSTOM_ATTRID_DEVICE_MODEL) {
+                uint8_t model = attr[i].attrData[0];
+                if (model >= DEVICE_SWITCH_NONE && model < DEVICE_SWITCH_MAX) {
+                    device_model_save(model);
+                }
+                printf("model: 0x%02x, ep: %d\r\n", model, epId);
             }
         }
     }

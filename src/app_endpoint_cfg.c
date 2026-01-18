@@ -277,6 +277,7 @@ zcl_onOffCfgAttr_t g_zcl_onOffCfgAttrs[AMT_RELAY] = {
         .switchActions     = ZCL_SWITCH_ACTION_OFF_ON,
         .custom_swtichType = ZCL_SWITCH_TYPE_MOMENTARY,
         .custom_decoupled  = CUSTOM_SWITCH_DECOUPLED_OFF,
+        .custom_model      = DEVICE_SWITCH_NONE,
     },
 };
 
@@ -285,7 +286,8 @@ const zclAttrInfo_t onOffCfg1_attrTbl[] =
     { ZCL_ATTRID_SWITCH_TYPE,               ZCL_ENUM8,    R,  (u8*)&g_zcl_onOffCfgAttrs[0].switchType         },
     { ZCL_ATTRID_SWITCH_ACTION,             ZCL_ENUM8,    RW, (u8*)&g_zcl_onOffCfgAttrs[0].switchActions      },
     { CUSTOM_ATTRID_SWITCH_TYPE,            ZCL_ENUM8,    RW, (u8*)&g_zcl_onOffCfgAttrs[0].custom_swtichType  },
-    { CUSTOM_ATTRID_DECOUPLED,              ZCL_ENUM8,    RWR,(u8*)&g_zcl_onOffCfgAttrs[0].custom_decoupled   },
+    { CUSTOM_ATTRID_DECOUPLED,              ZCL_ENUM8,    RWR, (u8*)&g_zcl_onOffCfgAttrs[0].custom_decoupled   },
+    { CUSTOM_ATTRID_DEVICE_MODEL,           ZCL_ENUM8,    RW, (u8*)&g_zcl_onOffCfgAttrs[0].custom_model       },
 
     { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,   R,  (u8*)&zcl_attr_global_clusterRevision           },
 };

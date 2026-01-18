@@ -3,17 +3,6 @@
 relay_settings_t relay_settings;
 dev_relay_t      dev_relay;
 
-static uint8_t checksum(uint8_t *data, uint16_t length) {
-
-    uint8_t crc8 = 0;
-
-    for(uint8_t i = 0; i < length; i++) {
-        crc8 += data[i];
-    }
-
-    return crc8;
-}
-
 static void check_first_start(uint8_t i) {
 
     switch(relay_settings.startUpOnOff[i]) {
@@ -44,12 +33,11 @@ static void check_first_start(uint8_t i) {
 
 void set_relay_status(uint8_t i, uint8_t status) {
 //    printf("set_relay_status(i = %d, status = %d). GPIO: %d\r\n", i, status, dev_relay.unit_relay[i].rl);
-    drv_gpio_write(dev_relay.unit_relay[i].rl, status);
+    if (device->device_en) drv_gpio_write(dev_relay.unit_relay[i].rl, status);
 }
 
-static void print_setting_sr(nv_sts_t st, relay_settings_t *relay_settings_tmp, bool save) {
-
 #if UART_PRINTF_MODE && DEBUG_SAVE
+static void print_setting_sr(nv_sts_t st, relay_settings_t *relay_settings_tmp, bool save) {
 
     printf("Settings %s. Return: %s\r\n", save?"saved":"restored", st==NV_SUCC?"Ok":"Error");
 
@@ -61,8 +49,8 @@ static void print_setting_sr(nv_sts_t st, relay_settings_t *relay_settings_tmp, 
         printf("switch_decoupled%d:  0x%02x\r\n", i, relay_settings_tmp->switch_decoupled[i]);
     }
 
-#endif
 }
+#endif
 
 nv_sts_t relay_settings_save() {
     nv_sts_t st = NV_SUCC;
@@ -123,6 +111,7 @@ nv_sts_t relay_settings_restore() {
         g_zcl_onOffCfgAttrs[i].custom_swtichType = g_zcl_onOffCfgAttrs[i].switchType = relay_settings.switchType[i];
         g_zcl_onOffCfgAttrs[i].switchActions = relay_settings.switchActions[i];
         g_zcl_onOffCfgAttrs[i].custom_decoupled = relay_settings.switch_decoupled[i];
+        g_zcl_onOffCfgAttrs[i].custom_model = device_switch_model;
     }
 
 #else
@@ -135,8 +124,9 @@ nv_sts_t relay_settings_restore() {
 void dev_relay_init() {
     dev_relay.amt = AMT_RELAY;
     dev_relay.unit_relay[0].ep = APP_ENDPOINT1;
-    dev_relay.unit_relay[0].sw = SWITCH1_GPIO;
-    dev_relay.unit_relay[0].rl = RELAY1_GPIO;
+    dev_relay.unit_relay[0].sw = device->switch_gpio.gpio; //SWITCH1_GPIO;
+    dev_relay.unit_relay[0].rl = device->relay_gpio.gpio; //RELAY1_GPIO;
+    cmdOnOff_off(APP_ENDPOINT1);
 
     if (relay_settings.switchType[0] == ZCL_SWITCH_TYPE_MULTIFUNCTION) {
         check_first_start(0);
