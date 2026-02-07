@@ -159,41 +159,48 @@ static void switch_first_start(uint8_t i, switch_status_t status) {
 //static void test(uint8_t i) {
 //
 //    static uint32_t counter = 0;
-////    drv_adc_enable(ON);
 ////    drv_adc_mode_pin_set(DRV_ADC_BASE_MODE, dev_relay.unit_relay[i].sw);
-////
-////    uint16_t key_level = drv_get_adc_data();
-////
-////    drv_adc_enable(OFF);
-////
-////    if (key_level < 80) printf("key_level: %d\r\n", key_level);
-//
-//
-//    if (!drv_gpio_read(dev_relay.unit_relay[i].sw)) {
-//        printf("Level Low: %d\r\n", counter++);
-////        printf("Level Low\r\n");
-//    } else {
-//        counter = 0;
-////        printf("Level High\r\n");
-//    }
-//
-//
-//
-//    sleep_ms(30);
-//}
-
-static void read_switch_toggle(uint8_t i) {
-
 //    drv_adc_enable(ON);
-//    drv_adc_mode_pin_set(DRV_ADC_BASE_MODE, dev_relay.unit_relay[i].sw);
 //
 //    uint16_t key_level = drv_get_adc_data();
 //
 //    drv_adc_enable(OFF);
 //
-//    if (key_level < 100) {
+////    if (key_level < 80)
+//
+//
+//        printf("key_level: %d\r\n", key_level);
+//
+//
+////    if (!drv_gpio_read(dev_relay.unit_relay[i].sw)) {
+////        printf("Level Low, time: %d\r\n", clock_time());
+//////        printf("Level Low: %d\r\n", counter++);
+//////        printf("Level Low\r\n");
+////    } else {
+////        counter = 0;
+//////        printf("Level High\r\n");
+////    }
+////
+//
+//
+//    sleep_ms(30);
+//}
 
-    if (!drv_gpio_read(dev_relay.unit_relay[i].sw)) {
+static bool switch_gpio_read(uint32_t pin) {
+    if (device_switch_model == DEVICE_SWITCH_2) {
+        drv_adc_enable(ON);
+        uint16_t key_level = drv_get_adc_data();
+        drv_adc_enable(OFF);
+        return (key_level < 500)?false:true;
+
+    }
+    return drv_gpio_read(pin)?true:false;
+}
+
+static void read_switch_toggle(uint8_t i) {
+
+    if (!switch_gpio_read(dev_relay.unit_relay[i].sw)) {
+//    if (!drv_gpio_read(dev_relay.unit_relay[i].sw)) {
         if (app_switch[i].status != SWITCH_ON) {
             if (app_switch[i].debounce != DEBOUNCE_SWITCH) {
                 app_switch[i].debounce++;
@@ -278,16 +285,8 @@ static void read_switch_multifunction(uint8_t i) {
     zcl_msInputAttr_t *msInputAttr = zcl_msInputAttrsGet();
     msInputAttr += i;
 
-//    drv_adc_enable(ON);
-//    drv_adc_mode_pin_set(DRV_ADC_BASE_MODE, dev_relay.unit_relay[i].sw);
-//
-//    uint16_t key_level = drv_get_adc_data();
-//
-//    drv_adc_enable(OFF);
-//
-//    if (key_level < 100) {
-
-    if (!drv_gpio_read(dev_relay.unit_relay[i].sw)) {
+    if (!switch_gpio_read(dev_relay.unit_relay[i].sw)) {
+//    if (!drv_gpio_read(dev_relay.unit_relay[i].sw)) {
         if (app_switch[i].status == SWITCH_ON) {
             if (clock_time_exceed(app_switch[i].time_hold, TIMEOUT_TICK_500MS)) {
                 if (!app_switch[i].hold) {

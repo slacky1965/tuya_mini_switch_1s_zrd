@@ -27,15 +27,6 @@
 
 #include "../common/comm_cfg.h"
 
-#define BOARD_ZG301Z                        0x25
-#define BOARD_JR_ZDS01                      0x26
-
-//#ifndef BOARD
-////#define BOARD                               BOARD_ZG301Z
-//#define BOARD                               BOARD_JR_ZDS01
-//#endif
-
-
 #define APP_RELEASE                         0x10        //app release 1.0
 #define APP_BUILD                           0x01        //app build 01, full version - v1.0.01
 #define STACK_RELEASE                       0x30        //stack release 3.0

@@ -1,6 +1,10 @@
 #ifndef SRC_INCLUDE_APP_DEVICE_H_
 #define SRC_INCLUDE_APP_DEVICE_H_
 
+#ifndef DEVICE_MODEL
+#define DEVICE_MODEL    DEVICE_SWITCH_NONE
+#endif
+
 #define DEVICE_EN(d)    (d?1:0)
 #define LED_ON(d)       (d?1:0)
 #define LED_OFF(d)      (d?1:0)
@@ -10,7 +14,7 @@
 typedef enum {
     DEVICE_SWITCH_NONE  = 0,
     DEVICE_SWITCH_1,                        /* jr_zds01 Gerier _TZ3000_6axxqqi2 */
-    DEVICE_SWITCH_2,                        /* zg301z Hobean                    */
+    DEVICE_SWITCH_2,                        /* zg301z Hobeian                   */
     DEVICE_SWITCH_MAX
 } device_switch_model_t;
 
