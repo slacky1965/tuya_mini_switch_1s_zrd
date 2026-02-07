@@ -29,7 +29,7 @@
 #include "app_main.h"
 #include "factory_reset.h"
 
-#define FACTORY_RESET_POWER_CNT_THRESHOLD		5	//times
+#define FACTORY_RESET_POWER_CNT_THRESHOLD		3	//times
 #define FACTORY_RESET_TIMEOUT					4	//second
 
 ev_timer_event_t *factoryRst_timerEvt = NULL;
