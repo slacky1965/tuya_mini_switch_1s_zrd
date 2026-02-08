@@ -2,7 +2,9 @@
 #include "factory_reset.h"
 
 //uint8_t device_online = false;
-uint8_t resp_time = false;
+//uint8_t resp_time = false;
+
+static bool boot_announce_sent = false;
 
 app_ctx_t g_appCtx = {
         .timerFactoryReset = NULL,
@@ -135,6 +137,11 @@ void user_app_init(void)
 }
 
 void app_task(void) {
+
+    if (!boot_announce_sent && zb_isDeviceJoinedNwk()) {
+        zb_zdoSendDevAnnance();
+        boot_announce_sent = true;
+    }
 
     factoryRst_handler();
 
