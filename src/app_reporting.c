@@ -5,7 +5,8 @@ uint8_t  last_seqNum[AMT_RELAY];
 
 static int32_t resetMsiTimerCb(void *args) {
 
-    uint8_t i = (uint8_t)((uint32_t)args) - 1;
+    uint8_t i = (uint8_t)((uint32_t)args);
+    uint8_t ep = i + 1;
 
 //    printf("resetMsiTimerCb. i: %d\r\n", i);
 
@@ -13,7 +14,7 @@ static int32_t resetMsiTimerCb(void *args) {
     msInputAttr += i;
     msInputAttr->value = ACTION_EMPTY;
 
-//    app_forcedReport(dev_relay.unit_relay[i].ep, ZCL_CLUSTER_GEN_MULTISTATE_INPUT_BASIC, ZCL_MULTISTATE_INPUT_ATTRID_PRESENT_VALUE);
+    app_forcedReport(ep, ZCL_CLUSTER_GEN_MULTISTATE_INPUT_BASIC, ZCL_MULTISTATE_INPUT_ATTRID_PRESENT_VALUE);
 
     return -1;
 }
