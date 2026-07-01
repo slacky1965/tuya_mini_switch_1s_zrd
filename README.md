@@ -9,8 +9,8 @@
 <img src="doc/images/device_model.jpg"/>
 
 | Custom Model | Zigbee Model | Z2M Model | Zigbee Manufacturer| Manufacturer | Update method | Descriprion |
-|--------------|--------------|-----------|--------------------|--------------|---------------|-------------|
-| model_1      | TS0001       | [JR-ZDS01](https://www.zigbee2mqtt.io/devices/JR-ZDS01.html)  | _TZ3000_6axxqqi2   | [Girier](https://www.zigbee2mqtt.io/supported-devices/#v=Girier)       | [OTA file](bin/1141-d3a3-1111114b-tuya_mini_switch_s1_zrd_model1.zigbee)      | [<img src="doc/images/icons_description.svg" width="25%" height="auto">](doc/model_01.md) |
+|:------------:|:------------:|:---------:|:------------------:|:------------:|:-------------:|:-----------:|
+| model_1      | TS0001       | [JR-ZDS01](https://www.zigbee2mqtt.io/devices/JR-ZDS01.html)  | _TZ3000_6axxqqi2   | [Girier](https://www.zigbee2mqtt.io/supported-devices/#v=Girier)       | [OTA file](bin/1141-d3a3-1111114b-tuya_mini_switch_s1_zrd_model1.zigbee)      | [<img src="doc/images/icons_description.svg" width="20%" height="auto">](doc/model_01.md) |
 | model_2      | ZG-301Z      | [ZG-301Z](https://www.zigbee2mqtt.io/devices/ZG-301Z.html)   | HOBEIAN            | [HOBEIAN](https://www.zigbee2mqtt.io/supported-devices/#v=HOBEIAN)      | [BIN file](bin/tuya_mini_switch_s1_zrd_model2_last_version.bin)      | [<img src="doc/images/icons_description.svg" width="25%" height="auto">](doc/model_02.md) |
 
 
