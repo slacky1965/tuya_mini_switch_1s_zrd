@@ -230,6 +230,7 @@ $(BIN_FILE): $(ELF_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
 	-$(RM) $(BIN_PATH)/*_model2.zigbee
+	-$(RM) $(BIN_PATH)/*_model3.zigbee
 
 sizedummy: $(ELF_FILE)
 	@echo 'Invoking: Print Size'
