@@ -81,6 +81,7 @@ const zdo_appIndCb_t appCbLst = {
     NULL,                               //nlme sync cnf cb
     sampleGW_tcJoinIndHandler,          //tc join ind cb
     sampleGW_tcFrameCntReachedHandler,  //tc detects that the frame counter is near limit
+    sampleGW_nwkStatusIndHandler,       //nwk status ind cb
 };
 
 /**
@@ -173,19 +174,8 @@ void led_init(void)
 
 void app_task(void)
 {
-    static bool assocPermit = 0;
-    if (assocPermit != zb_getMacAssocPermit()) {
-        assocPermit = zb_getMacAssocPermit();
-        if (assocPermit) {
-            led_on(LED_PERMIT);
-        } else {
-            led_off(LED_PERMIT);
-        }
-    }
-
-    if (BDB_STATE_GET() == BDB_STATE_IDLE) {
-        app_key_handler();
-    }
+    app_key_handler();
+    localPermitJoinState();
 }
 
 static void sampleGwSysException(void)
