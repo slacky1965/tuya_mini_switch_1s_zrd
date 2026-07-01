@@ -1,6 +1,6 @@
 # <a id="Top">Tuya Switch Module 1 gang with custom firmware</a>
 
-[Repository watermeter_zed](https://github.com/slacky1965/tuya_mini_switch_1s_zrd)
+[Project repository](https://github.com/slacky1965/tuya_mini_switch_1s_zrd)
 
 ---
 
