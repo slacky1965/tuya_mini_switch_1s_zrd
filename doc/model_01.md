@@ -8,10 +8,10 @@
 
 ---
 
-<img src="images/board_model_01_top.jpg width="20%" height="auto""/>
+<img src="images/board_model_01_top.jpg" width="20%" height="auto"/>
 
 ---
 
-<img src="images/board_model_01_bottom.jpg width="20%" height="auto""/>
+<img src="images/board_model_01_bottom.jpg" width="20%" height="auto"/>
 
 ---
