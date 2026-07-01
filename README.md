@@ -1,12 +1,21 @@
 # <a id="Top">Tuya Switch Module 1 gang with custom firmware</a>
 
-### Custom firmware for Tuya Switch models
+[Repository watermeter_zed](https://github.com/slacky1965/tuya_mini_switch_1s_zrd)
 
-# TODO:
+---
 
-### Device Model
+<img src="doc/images/smart_switch_module.jpg"/>
 
-<img src="doc/images/device_model.jpg"/>
+---
+
+<img src="doc/images/z2m_about.jpg"/>
+
+---
+
+<img src="doc/images/z2m_exposes.jpg"/>
+
+---
+
 
 | Custom Model | Zigbee Model | Z2M Model | Zigbee Manufacturer| Manufacturer | Update method | Descriprion |
 |:------------:|:------------:|:---------:|:------------------:|:------------:|:-------------:|:-----------:|
