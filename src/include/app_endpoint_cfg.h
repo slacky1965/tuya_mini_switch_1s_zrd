@@ -1,9 +1,9 @@
 #ifndef SRC_INCLUDE_APP_ENDPOINT_CFG_H_
 #define SRC_INCLUDE_APP_ENDPOINT_CFG_H_
 
-#define APP_ENDPOINT1 0x01
-#define APP_ENDPOINT2 0x02
-#define APP_ENDPOINT3 0x03
+#define APP_ENDPOINT1                   0x01
+#define APP_ENDPOINT2                   0x02
+#define APP_ENDPOINT3                   0x03
 
 /**
  *  @brief Defined for basic cluster attributes
@@ -16,6 +16,7 @@ typedef struct {
     uint8_t  manuName[ZCL_BASIC_MAX_LENGTH];
     uint8_t  modelId[ZCL_BASIC_MAX_LENGTH];
     uint8_t  dateCode[ZCL_BASIC_MAX_LENGTH];
+    uint8_t  productLabel[ZCL_BASIC_MAX_LENGTH];
     uint8_t  powerSource;
     uint8_t  genDevClass;                        //attr 8
     uint8_t  genDevType;                         //attr 9
@@ -84,6 +85,17 @@ typedef struct {
     uint8_t     status_flag;
 } zcl_msInputAttr_t;
 
+/**
+ *  @brief Defined for level cluster attributes
+ */
+typedef struct {
+    uint8_t     currentLevel;
+    uint8_t     minLevel;
+    uint8_t     maxLevel;
+    uint8_t     options;
+    uint8_t     defaultMoveRate;
+    uint16_t    transitionTime;
+} zcl_levelAttr_t;
 
 extern uint8_t APP_CB_CLUSTER_NUM1;
 extern const zcl_specClusterInfo_t  g_appClusterList1[];
@@ -97,11 +109,13 @@ extern zcl_sceneAttr_t              g_zcl_sceneAttrs[];
 extern zcl_onOffAttr_t              g_zcl_onOffAttrs[];
 extern zcl_onOffCfgAttr_t           g_zcl_onOffCfgAttrs[];
 extern zcl_msInputAttr_t            g_zcl_msInputAttrs[];
+extern zcl_levelAttr_t              g_zcl_levelAttrs[];
 
 #define zcl_groupAttrsGet()         g_zcl_groupAttrs
 #define zcl_sceneAttrGet()          g_zcl_sceneAttrs
-#define zcl_onOffAttrsGet()         g_zcl_onOffAttrs;
-#define zcl_onOffCfgAttrsGet()      g_zcl_onOffCfgAttrs;
-#define zcl_msInputAttrsGet()       g_zcl_msInputAttrs;
+#define zcl_onOffAttrsGet()         g_zcl_onOffAttrs
+#define zcl_onOffCfgAttrsGet()      g_zcl_onOffCfgAttrs
+#define zcl_msInputAttrsGet()       g_zcl_msInputAttrs
+#define zcl_levelAttrsGet()         g_zcl_levelAttrs
 
 #endif /* SRC_INCLUDE_APP_ENDPOINT_CFG_H_ */

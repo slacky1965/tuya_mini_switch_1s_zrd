@@ -4,11 +4,14 @@
 #define AMT_RELAY   1
 
 typedef struct __attribute__((packed)) {
-    uint8_t status_onoff[AMT_RELAY];
-    uint8_t startUpOnOff[AMT_RELAY];
-    uint8_t switchType[AMT_RELAY];         // 0x00 - toggle, 0x01 - momentary
-    uint8_t switchActions[AMT_RELAY];
-    uint8_t switch_decoupled[AMT_RELAY];
+    uint8_t  startUpOnOff[AMT_RELAY];
+    uint8_t  switchType[AMT_RELAY];
+    uint8_t  switchActions[AMT_RELAY];
+    uint8_t  switch_decoupled[AMT_RELAY];
+    uint8_t  defaultMoveRate[AMT_RELAY];
+    uint8_t  levelMin[AMT_RELAY];
+    uint8_t  levelMax[AMT_RELAY];
+    uint16_t transitionTime[AMT_RELAY];
     uint8_t crc;
 } relay_settings_t;
 

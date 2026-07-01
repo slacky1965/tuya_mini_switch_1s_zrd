@@ -32,15 +32,28 @@
 #define TIMEOUT_1MIN30SEC   (90   * 1000)       /* timeout 1.5 min  */
 #define TIMEOUT_2MIN        (120  * 1000)       /* timeout 2 min    */
 #define TIMEOUT_5MIN        (300  * 1000)       /* timeout 5 min    */
-#define TIMEOUT_10MIN       9600  * 1000)       /* timeout 10 min   */
-#define TIMEOUT_15MIN       9900  * 1000)       /* timeout 15 min   */
+#define TIMEOUT_10MIN       (600  * 1000)       /* timeout 10 min   */
+#define TIMEOUT_15MIN       (900  * 1000)       /* timeout 15 min   */
 #define TIMEOUT_30MIN       (1800 * 1000)       /* timeout 30 min   */
 #define TIMEOUT_60MIN       (3600 * 1000)       /* timeout 60 min   */
+
+#if (UART_PRINTF_MODE || USB_PRINTF_MODE)
+#define APP_DEBUG(compileFlag, ...)             do{ \
+                                                    if(compileFlag) { \
+                                                        uint32_t r = drv_disable_irq(); \
+                                                        TRACE(__VA_ARGS__); \
+                                                        drv_restore_irq(r); \
+                                                    } \
+                                                }while(0)
+
+#else
+    #define APP_DEBUG(compileFlag, ...)
+#endif
 
 int32_t delayedMcuResetCb(void *arg);
 int32_t delayedFactoryResetCb(void *arg);
 int32_t delayedFullResetCb(void *arg);
-uint32_t itoa(uint32_t value, uint8_t *ptr);
+uint32_t itoa(int32_t value, uint8_t *ptr);
 uint64_t atoi(uint16_t len, uint8_t *data);
 uint32_t from24to32(const uint8_t *str);
 uint64_t fromPtoInteger(uint16_t len, uint8_t *data);
@@ -52,6 +65,6 @@ uint8_t *print_str_zcl(uint8_t *str_zcl);
 void start_message();
 double nat_log(double x);
 uint8_t checksum(uint8_t *data, uint16_t length);
-int32_t net_steer_start_offCb(void *args);
+//int32_t net_steer_start_offCb(void *args);
 
 #endif /* SRC_INCLUDE_APP_UTILITY_H_ */

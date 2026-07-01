@@ -6,7 +6,7 @@ static ftime_t ftime;
 static uint32_t local_time = 0;
 static uint32_t attr_data;
 
-void get_time(uint32_t *local_time) {
+bool get_time(uint32_t *local_time) {
 
     uint16_t attr_len;
 
@@ -14,9 +14,9 @@ void get_time(uint32_t *local_time) {
 
     if (attr_data != 0xFFFFFFFF) {
         *local_time = attr_data;
-    } else {
-        local_time = NULL;
+        return true;
     }
+    return false;
 }
 
 static int32_t app_clockCb(void *arg) {
@@ -24,14 +24,12 @@ static int32_t app_clockCb(void *arg) {
     uint32_t *p_local_time = &local_time;
 
     if (time_sent) {
-        get_time(p_local_time);
-
-        if (p_local_time) {
+        if (get_time(p_local_time)) {
             local_time++;
             zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_GEN_TIME, ZCL_ATTRID_LOCAL_TIME, (uint8_t*)&local_time);
 
-#if UART_PRINTF_MODE && DEBUG_TIME
-            printf("Local time: %d\r\n", (local_time+UNIX_TIME_CONST));
+#if UART_PRINTF_MODE && DEBUG_TIME_EN
+            APP_DEBUG(DEBUG_TIME_EN, "Local time: %d\r\n", (local_time+UNIX_TIME_CONST));
 #endif
         }
     }
@@ -119,7 +117,7 @@ ftime_t *get_ftime() {
     ftime.wday = (y / 12) + (y % 12) + ((y % 12) / 4);
     uint8_t m_idx[] = {6, 2, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
     ftime.wday += m_idx[ftime.month - 1];
-    if ((y % 44) == 0) {
+    if ((y % 4) == 0) {
       if ((ftime.month == 1) || (ftime.month == 2)) ftime.wday--;
     }
     ftime.wday += ftime.day;
@@ -155,7 +153,7 @@ void print_time() {
         ftime.minute = (counter / 60) % 60;
         ftime.second = (counter % 60);
 #if UART_PRINTF_MODE
-        printf("[%d-%s%d-%s%d %s%d:%s%d:%s%d] ",
+        APP_DEBUG(DEBUG_TIME_EN, "[%d-%s%d-%s%d %s%d:%s%d:%s%d] ",
                     ftime.year,
                     ftime.month<10?"0":"", ftime.month,
                     ftime.day<10?"0":"", ftime.day,

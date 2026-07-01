@@ -7,7 +7,7 @@ static void check_first_start(uint8_t i) {
 
     switch(relay_settings.startUpOnOff[i]) {
         case ZCL_START_UP_ONOFF_SET_ONOFF_TO_PREVIOUS:
-            if (relay_settings.status_onoff[i]) cmdOnOff_on(dev_relay.unit_relay[i].ep);
+            if (status_onoff.status_onoff[i]) cmdOnOff_on(dev_relay.unit_relay[i].ep);
             else cmdOnOff_off(dev_relay.unit_relay[i].ep);
             break;
         case ZCL_START_UP_ONOFF_SET_ONOFF_TOGGLE:
@@ -36,17 +36,17 @@ void set_relay_status(uint8_t i, uint8_t status) {
     if (device->device_en) drv_gpio_write(dev_relay.unit_relay[i].rl, status);
 }
 
-#if UART_PRINTF_MODE && DEBUG_SAVE
+#if UART_PRINTF_MODE && DEBUG_SAVE_EN
 static void print_setting_sr(nv_sts_t st, relay_settings_t *relay_settings_tmp, bool save) {
 
-    printf("Settings %s. Return: %s\r\n", save?"saved":"restored", st==NV_SUCC?"Ok":"Error");
+    APP_DEBUG(DEBUG_SAVE_EN, "Settings %s. Return: %s\r\n", save?"saved":"restored", st==NV_SUCC?"Ok":"Error");
 
     for (uint8_t i = 0; i < AMT_RELAY; i++) {
-        printf("status_onoff%d:      0x%02x\r\n", i, relay_settings_tmp->status_onoff[i]);
-        printf("startUpOnOff%d:      0x%02x\r\n", i, relay_settings_tmp->startUpOnOff[i]);
-        printf("switchActions%d:     0x%02x\r\n", i, relay_settings_tmp->switchActions[i]);
-        printf("switchType%d:        0x%02x\r\n", i, relay_settings_tmp->switchType[i]);
-        printf("switch_decoupled%d:  0x%02x\r\n", i, relay_settings_tmp->switch_decoupled[i]);
+        APP_DEBUG(DEBUG_SAVE_EN, "status_onoff%d:      0x%02x\r\n", i, status_onoff.status_onoff[i]);
+        APP_DEBUG(DEBUG_SAVE_EN, "startUpOnOff%d:      0x%02x\r\n", i, relay_settings_tmp->startUpOnOff[i]);
+        APP_DEBUG(DEBUG_SAVE_EN, "switchActions%d:     0x%02x\r\n", i, relay_settings_tmp->switchActions[i]);
+        APP_DEBUG(DEBUG_SAVE_EN, "switchType%d:        0x%02x\r\n", i, relay_settings_tmp->switchType[i]);
+        APP_DEBUG(DEBUG_SAVE_EN, "switch_decoupled%d:  0x%02x\r\n", i, relay_settings_tmp->switch_decoupled[i]);
     }
 
 }
@@ -58,11 +58,13 @@ nv_sts_t relay_settings_save() {
 #if NV_ENABLE
 
 #if UART_PRINTF_MODE
-    printf("Saved relay settings\r\n");
+    APP_DEBUG(DEBUG_SAVE_EN, "Saved relay settings\r\n");
 #endif
 
-    relay_settings.crc = checksum((uint8_t*)&relay_settings, sizeof(relay_settings_t)-1);
-    st = nv_flashWriteNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, sizeof(relay_settings_t), (uint8_t*)&relay_settings);
+    uint32_t relay_settings_size = sizeof(relay_settings_t);
+
+    relay_settings.crc = checksum((uint8_t*)&relay_settings, relay_settings_size);
+    st = nv_flashWriteNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, relay_settings_size, (uint8_t*)&relay_settings);
 
 #else
     st = NV_ENABLE_PROTECT_ERROR;
@@ -76,15 +78,18 @@ nv_sts_t relay_settings_restore() {
 
 #if NV_ENABLE
 
+    status_onoff_restore();
+
+    uint32_t relay_settings_size = sizeof(relay_settings_t);
     relay_settings_t relay_settings_tmp;
 
-    st = nv_flashReadNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, sizeof(relay_settings_t), (uint8_t*)&relay_settings_tmp);
+    st = nv_flashReadNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, relay_settings_size, (uint8_t*)&relay_settings_tmp);
 
-    if (st == NV_SUCC && relay_settings_tmp.crc == checksum((uint8_t*)&relay_settings_tmp, sizeof(relay_settings_t)-1)) {
+    if (st == NV_SUCC && relay_settings_tmp.crc == checksum((uint8_t*)&relay_settings_tmp, relay_settings_size)) {
 
 #if UART_PRINTF_MODE
-        printf("Restored relay settings\r\n");
-#if DEBUG_SAVE
+        APP_DEBUG(DEBUG_SAVE_EN, "Restored relay settings\r\n");
+#if DEBUG_SAVE_EN
         print_setting_sr(st, &relay_settings_tmp, false);
 #endif
 #endif
@@ -92,12 +97,11 @@ nv_sts_t relay_settings_restore() {
     } else {
         /* default config */
 #if UART_PRINTF_MODE
-        printf("Default relay settings \r\n");
+        APP_DEBUG(DEBUG_SAVE_EN, "Default relay settings \r\n");
 #endif
 
         for (uint8_t i = 0; i < AMT_RELAY; i++) {
             relay_settings_tmp.startUpOnOff[i] = ZCL_START_UP_ONOFF_SET_ONOFF_TO_OFF;
-            relay_settings_tmp.status_onoff[i] = ZCL_ONOFF_STATUS_OFF;
             relay_settings_tmp.switchActions[i] = ZCL_SWITCH_ACTION_OFF_ON;
             relay_settings_tmp.switchType[i] = ZCL_SWITCH_TYPE_MOMENTARY;
             relay_settings_tmp.switch_decoupled[i] = CUSTOM_SWITCH_DECOUPLED_OFF;
@@ -106,7 +110,7 @@ nv_sts_t relay_settings_restore() {
 
     memcpy(&relay_settings, &relay_settings_tmp, (sizeof(relay_settings_t)));
     for (uint8_t i = 0; i < AMT_RELAY; i++) {
-        g_zcl_onOffAttrs[i].onOff = relay_settings.status_onoff[i];
+        g_zcl_onOffAttrs[i].onOff = status_onoff.status_onoff[i];
         g_zcl_onOffAttrs[i].startUpOnOff = relay_settings.startUpOnOff[i];
         g_zcl_onOffCfgAttrs[i].custom_swtichType = g_zcl_onOffCfgAttrs[i].switchType = relay_settings.switchType[i];
         g_zcl_onOffCfgAttrs[i].switchActions = relay_settings.switchActions[i];

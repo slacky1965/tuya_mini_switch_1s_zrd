@@ -56,6 +56,7 @@ const uint16_t app_ep1_inClusterList[] = {
     ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG,
 #endif
     ZCL_CLUSTER_GEN_MULTISTATE_INPUT_BASIC,
+    ZCL_CLUSTER_GEN_LEVEL_CONTROL,
 };
 
 /**
@@ -68,7 +69,7 @@ const uint16_t app_ep1_outClusterList[] = {
 #ifdef ZCL_OTA
     ZCL_CLUSTER_OTA,
 #endif
-//    ZCL_CLUSTER_GEN_TIME,
+    ZCL_CLUSTER_GEN_LEVEL_CONTROL,
 };
 
 /**
@@ -107,9 +108,8 @@ zcl_basicAttr_t g_zcl_basicAttrs =
     .powerSource    = POWER_SOURCE_MAINS_1_PHASE,
     .swBuildId      = ZCL_BASIC_SW_BUILD_ID,
     .deviceEnable   = TRUE,
+    .productLabel   = {0},
 };
-
-uint8_t zclVersionServer;
 
 const zclAttrInfo_t basic_attrTbl[] =
 {
@@ -123,23 +123,12 @@ const zclAttrInfo_t basic_attrTbl[] =
     { ZCL_ATTRID_BASIC_POWER_SOURCE,        ZCL_ENUM8,      R,  (uint8_t*)&g_zcl_basicAttrs.powerSource     },
     { ZCL_ATTRID_BASIC_DEV_ENABLED,         ZCL_BOOLEAN,    RW, (uint8_t*)&g_zcl_basicAttrs.deviceEnable    },
     { ZCL_ATTRID_BASIC_SW_BUILD_ID,         ZCL_CHAR_STR,   R,  (uint8_t*)&g_zcl_basicAttrs.swBuildId       },
+    { ZCL_ATTRID_BASIC_PRODUCT_LABEL,       ZCL_CHAR_STR,   R,  (uint8_t*)&g_zcl_basicAttrs.productLabel    },
 
     { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,     R,  (uint8_t*)&zcl_attr_global_clusterRevision  },
 };
 
 #define ZCL_BASIC_ATTR_NUM    sizeof(basic_attrTbl) / sizeof(zclAttrInfo_t)
-
-uint8_t zclVersionServer;
-
-const zclAttrInfo_t version_attrTbl[] =
-{
-    { ZCL_ATTRID_BASIC_ZCL_VER,             ZCL_UINT8,      R,  (uint8_t*)&zclVersionServer                 },
-
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,     R,  (uint8_t*)&zcl_attr_global_clusterRevision  },
-};
-
-#define ZCL_BASIC_SERVER_ATTR_NUM    sizeof(version_attrTbl) / sizeof(zclAttrInfo_t)
-
 
 /* Identify */
 zcl_identifyAttr_t g_zcl_identifyAttrs =
@@ -296,6 +285,31 @@ const zclAttrInfo_t onOffCfg1_attrTbl[] =
 
 #endif //ZCL_ON_OFF_SWITCH_CFG
 
+zcl_levelAttr_t g_zcl_levelAttrs[AMT_RELAY] = {
+    {
+        .currentLevel = 10,
+        .minLevel = ZCL_LEVEL_ATTR_MIN_LEVEL,
+        .maxLevel = ZCL_LEVEL_ATTR_MAX_LEVEL,
+        .options  = 0,
+        .defaultMoveRate = 100,
+        .transitionTime = LEVEL_TRANSITION_TIME,
+    },
+};
+
+const zclAttrInfo_t level1_attrTbl[] =
+{
+    { ZCL_ATTRID_LEVEL_CURRENT_LEVEL,       ZCL_UINT8,      RR, (uint8_t*)&g_zcl_levelAttrs[0].currentLevel },
+    { ZCL_ATTRID_LEVEL_MIN_LEVEL,           ZCL_UINT8,      RW, (uint8_t*)&g_zcl_levelAttrs[0].minLevel     },
+    { ZCL_ATTRID_LEVEL_MAX_LEVEL,           ZCL_UINT8,      RW, (uint8_t*)&g_zcl_levelAttrs[0].maxLevel     },
+    { ZCL_ATTRID_LEVEL_OPTIONS,             ZCL_BITMAP8,    RW, (uint8_t*)&g_zcl_levelAttrs[0].options      },
+    { ZCL_ATTRID_LEVEL_DEFAULT_MOVE_RATE,   ZCL_UINT8,      RW, (uint8_t*)&g_zcl_levelAttrs[0].defaultMoveRate  },
+    { ZCL_ATTRID_LEVEL_ON_OFF_TRANSITION_TIME, ZCL_UINT16,  RW, (uint8_t*)&g_zcl_levelAttrs[0].transitionTime   },
+
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,     R,  (u8*)&zcl_attr_global_clusterRevision       },
+};
+
+#define ZCL_LEVEL1_ATTR_NUM   sizeof(level1_attrTbl) / sizeof(zclAttrInfo_t)
+
 /**
  *  @brief Definition for mini relay ZCL specific cluster
  */
@@ -316,7 +330,8 @@ const zcl_specClusterInfo_t g_appClusterList1[] =
 #ifdef ZCL_ON_OFF_SWITCH_CFG
     {ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG,  MANUFACTURER_CODE_NONE, ZCL_ON_OFF1_CFG_ATTR_NUM,   onOffCfg1_attrTbl,   zcl_onoffCfg_register,  NULL            },
 #endif
-    {ZCL_CLUSTER_GEN_MULTISTATE_INPUT_BASIC,MANUFACTURER_CODE_NONE, ZCL_MSINPUT1_ATTR_NUM,       msInput1_attrTbl,    zcl_multistate_input_register,  app_msInputCb},
+    {ZCL_CLUSTER_GEN_MULTISTATE_INPUT_BASIC,MANUFACTURER_CODE_NONE, ZCL_MSINPUT1_ATTR_NUM,      msInput1_attrTbl,    zcl_multistate_input_register,  app_msInputCb},
+    {ZCL_CLUSTER_GEN_LEVEL_CONTROL,         MANUFACTURER_CODE_NONE, ZCL_LEVEL1_ATTR_NUM,        level1_attrTbl,      zcl_level_register,             app_levelCb    },
 };
 
 uint8_t APP_CB_CLUSTER_NUM1 = (sizeof(g_appClusterList1)/sizeof(g_appClusterList1[0]));

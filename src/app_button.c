@@ -3,14 +3,22 @@
 static button_t button;
 static uint8_t  keyPressed;
 
+static int32_t net_steer_start_offCb(void *args) {
+
+    g_appCtx.net_steer_start = false;
+
+    light_blink_stop();
+
+    return -1;
+}
 
 static void buttonKeepPressed(u8 btNum) {
     button.state = APP_FACTORY_NEW_DOING;
     button.ctn = 0;
 
     if(btNum == VK_SW1 && device_switch_model != DEVICE_SWITCH_NONE) {
-#if UART_PRINTF_MODE && DEBUG_BUTTON
-        printf("The button was keep pressed for 5 seconds\r\n");
+#if UART_PRINTF_MODE && DEBUG_BUTTON_EN
+        APP_DEBUG(DEBUG_BUTTON_EN, "The button was keep pressed for 5 seconds\r\n");
 #endif
         zb_factoryReset();
         g_appCtx.net_steer_start = true;
@@ -24,8 +32,8 @@ static void buttonSinglePressed(u8 btNum) {
 
     switch (btNum) {
         case VK_SW1:
-#if UART_PRINTF_MODE && DEBUG_BUTTON
-            printf("Button push 1 time\r\n");
+#if UART_PRINTF_MODE && DEBUG_BUTTON_EN
+            APP_DEBUG(DEBUG_BUTTON_EN, "Button push 1 time\r\n");
 #endif
             cmdOnOff_toggle(APP_ENDPOINT1);
             if(zb_isDeviceJoinedNwk()) {
