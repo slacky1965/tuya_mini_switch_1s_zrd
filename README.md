@@ -1,6 +1,7 @@
 # <a id="Top">Tuya Switch Module 1 gang with custom firmware</a>
 
-[Project repository](https://github.com/slacky1965/tuya_mini_switch_1s_zrd)
+[![](https://img.shields.io/badge/Repository-tuya__mini__switch__1s__zrd-blue.svg?logo=github)](https://github.com/slacky1965/tuya_mini_switch_1s_zrd)
+[![](https://img.shields.io/github/v/release/slacky1965/tuya_mini_switch_1s_zrd.svg)](https://github.com/slacky1965/tuya_mini_switch_1s_zrd/releases)
 
 ---
 
