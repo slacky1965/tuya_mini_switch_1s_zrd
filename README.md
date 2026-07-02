@@ -24,6 +24,10 @@
 | model_2 | ZG-301Z | [ZG-301Z](https://www.zigbee2mqtt.io/devices/ZG-301Z.html) | HOBEIAN | [HOBEIAN](https://www.zigbee2mqtt.io/supported-devices/#v=HOBEIAN) | [BIN file](bin/tuya_mini_switch_s1_zrd_model2_last_version.bin) | [<img src="doc/images/icons_description.svg" width="20%" height="auto">](doc/model_02.md) |
 | model_3 (mini) | ZG-301Z | [ZG-301Z](https://www.zigbee2mqtt.io/devices/ZG-301Z.html) | HOBEIAN | [HOBEIAN](https://www.zigbee2mqtt.io/supported-devices/#v=HOBEIAN) | [BIN file](bin/tuya_mini_switch_s1_zrd_model3_last_version.bin) | [<img src="doc/images/icons_description.svg" width="20%" height="auto">](doc/model_03.md) |
 
+- 1.0.01
+	- Начало.
+- 1.0.02
+	- Добавлена возможность управлять яркостью.
 
 [Наверх](#Top)
 
