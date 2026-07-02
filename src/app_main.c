@@ -122,16 +122,18 @@ void user_app_init(void)
 
 #if ZCL_WWAH_SUPPORT
     /* Initialize WWAH server */
-    wwah_init(WWAH_TYPE_SERVER, (af_simple_descriptor_t *)&app_simpleDesc);
+    wwah_init(WWAH_TYPE_SERVER, (af_simple_descriptor_t *)&app_ep1_simpleDesc);
 #endif
 
     if (zb_getLocalShortAddr() >= 0xFFF8) {
         light_blink_start(90, 250, 750);
     }
 
-    printf("zb_getLocalShortAddr: 0x%04x\r\n", zb_getLocalShortAddr());
+    APP_DEBUG(UART_PRINTF_MODE, "zb_getLocalShortAddr: 0x%04x\r\n", zb_getLocalShortAddr());
 
-//    TL_ZB_TIMER_SCHEDULE(app_time_cmdCb, NULL, TIMEOUT_10SEC);
+#if DEBUG_TEST_STATUS_ONOFF_SAVE_EN
+    TL_ZB_TIMER_SCHEDULE(test_onoff_save, NULL, TIMEOUT_1SEC);
+#endif
 
 //    printf("FLASH_ADDR_OF_OTA_IMAGE: 0x%08x\r\n", FLASH_ADDR_OF_OTA_IMAGE);
 }
@@ -161,7 +163,7 @@ extern volatile u16 T_evtExcept[4];
 static void app_sysException(void) {
 
 #if UART_PRINTF_MODE
-    printf("app_sysException, line: %d, event: %d, reset\r\n", T_evtExcept[0], T_evtExcept[1]);
+    APP_DEBUG(UART_PRINTF_MODE, "app_sysException, line: %d, event: %d, reset\r\n", T_evtExcept[0], T_evtExcept[1]);
 #endif
 
 #if 1
@@ -230,9 +232,9 @@ void user_init(bool isRetention)
             0, 65000, (uint8_t *)&reportableChange);
 
     /* MultistateInput */
-    uint16_t reportableChange_u16 = 0x01;
-    bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_MULTISTATE_INPUT_BASIC,
-            ZCL_MULTISTATE_INPUT_ATTRID_PRESENT_VALUE, 10, 0, (uint8_t *)&reportableChange_u16);
+//    uint16_t reportableChange_u16 = 0x01;
+//    bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_MULTISTATE_INPUT_BASIC,
+//            ZCL_MULTISTATE_INPUT_ATTRID_PRESENT_VALUE, 10, 0, (uint8_t *)&reportableChange_u16);
 
     /* Initialize BDB */
     bdb_init((af_simple_descriptor_t *)&app_ep1_simpleDesc, &g_bdbCommissionSetting, &g_zbBdbCb, 1);

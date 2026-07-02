@@ -15,9 +15,15 @@ else
 		IMAGE_TYPE = 513
 		PROJECT_DEF = "-DDEVICE_MODEL=DEVICE_SWITCH_2"
 	else
-		MANUF_CODE = 4417
-		IMAGE_TYPE = 54179
-		PROJECT_DEF = "-DDEVICE_MODEL=DEVICE_SWITCH_NONE"
+		ifeq ($(PROJECT_MODEL),_model3)
+			MANUF_CODE = 4417
+			IMAGE_TYPE = 513
+			PROJECT_DEF = "-DDEVICE_MODEL=DEVICE_SWITCH_3"
+		else
+			MANUF_CODE = 4417
+			IMAGE_TYPE = 54179
+			PROJECT_DEF = "-DDEVICE_MODEL=DEVICE_SWITCH_NONE"
+		endif
 	endif
 endif
 
@@ -102,11 +108,14 @@ else
 GCC_FLAGS += \
 -DBUILD_DATE="{8,$(ZCL_VERSION_FILE)}"
 endif
-  
+
+DEBUG ?= "-DUART_PRINTF_MODE=ON"
+
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE) \
-$(PROJECT_DEF)
+$(PROJECT_DEF) \
+$(DEBUG)
 
 OBJ_SRCS := 
 S_SRCS := 
@@ -160,7 +169,7 @@ all: pre-build main-build
 flash8000: $(BIN_FILE)
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x8000 $(BIN_FILE)
 
-flash0: $(BIN_FILE)
+flash0:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BIN_FILE)
 
 erase-flash:
@@ -221,6 +230,7 @@ $(BIN_FILE): $(ELF_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
 	-$(RM) $(BIN_PATH)/*_model2.zigbee
+	-$(RM) $(BIN_PATH)/*_model3.zigbee
 
 sizedummy: $(ELF_FILE)
 	@echo 'Invoking: Print Size'

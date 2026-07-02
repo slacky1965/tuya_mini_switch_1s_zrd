@@ -1,13 +1,15 @@
 #include "app_main.h"
 
-#define ADDR_DEVICE_SWITCH_CFG  0x75000
-#define ID_DEVICE_SWITCH_CFG    0x1465
+#define DEVICE_MODEL_CFG_ADDR   0x75000
+#define DEVICE_MODEL_CFG_ID     0x1465
 
 typedef struct {
     uint16_t id;
     uint8_t  device_model;
     uint8_t  crc;
 } config_switch_model_t;
+
+static uint8_t productLabel[10] = {8,'M','o','d','e','l',' ','0','0',0};
 
 switch_device_t switch_device[DEVICE_SWITCH_MAX];
 device_switch_model_t device_switch_model = DEVICE_MODEL;
@@ -29,7 +31,7 @@ static void device_model_init() {
         device_gpio_init(&device->button_gpio);
         device_gpio_init(&device->led_gpio);
         device_gpio_init(&device->relay_gpio);
-        if (device_switch_model == DEVICE_SWITCH_2) {
+        if (device_switch_model == DEVICE_SWITCH_2 || device_switch_model == DEVICE_SWITCH_3) {
             drv_adc_init();
             drv_adc_mode_pin_set(DRV_ADC_BASE_MODE, device->switch_gpio.gpio);
             drv_gpio_up_down_resistor(device->switch_gpio.gpio, PM_PIN_PULLUP_10K);
@@ -43,17 +45,39 @@ static void device_model_init() {
 //        light_off();
         dev_relay_init();
     }
+    switch(device_switch_model) {
+        case DEVICE_SWITCH_1:
+            productLabel[7] = '0';
+            productLabel[8] = '1';
+            break;
+        case DEVICE_SWITCH_2:
+            productLabel[7] = '0';
+            productLabel[8] = '2';
+            break;
+        case DEVICE_SWITCH_3:
+            productLabel[7] = '0';
+            productLabel[8] = '3';
+            break;
+        default:
+            productLabel[7] = '0';
+            productLabel[8] = '0';
+            break;
+    }
+    memcpy(g_zcl_basicAttrs.productLabel, productLabel, 9);
     kb_drv_init();
     switch_init();
+
+    APP_DEBUG(UART_PRINTF_MODE, "Device %d inited\r\n", device_switch_model);
 }
 
 void device_model_restore() {
 
     config_switch_model_t model_cfg;
+    uint32_t config_switch_model_size = sizeof(config_switch_model_t);
 
-    flash_read_page(ADDR_DEVICE_SWITCH_CFG, sizeof(config_switch_model_t), (uint8_t*)&model_cfg);
+    flash_read_page(DEVICE_MODEL_CFG_ADDR, config_switch_model_size, (uint8_t*)&model_cfg);
 
-    if (model_cfg.id == ID_DEVICE_SWITCH_CFG && model_cfg.crc == checksum((uint8_t*)&model_cfg, sizeof(config_switch_model_t)-1)) {
+    if (model_cfg.id == DEVICE_MODEL_CFG_ID && model_cfg.crc == checksum((uint8_t*)&model_cfg, config_switch_model_size)) {
         device_switch_model = model_cfg.device_model;
     } else {
         device_switch_model = DEVICE_MODEL;
@@ -64,13 +88,14 @@ void device_model_restore() {
 
 void device_model_save(uint8_t model) {
     config_switch_model_t model_cfg;
+    uint32_t config_switch_model_size = sizeof(config_switch_model_t);
 
-    model_cfg.id = ID_DEVICE_SWITCH_CFG;
+    model_cfg.id = DEVICE_MODEL_CFG_ID;
     device_switch_model = model_cfg.device_model = model;
 
-    flash_erase(ADDR_DEVICE_SWITCH_CFG);
-    model_cfg.crc = checksum((uint8_t*)&(model_cfg), sizeof(config_switch_model_t)-1);
-    flash_write(ADDR_DEVICE_SWITCH_CFG, sizeof(config_switch_model_t), (uint8_t*)&(model_cfg));
+    flash_erase(DEVICE_MODEL_CFG_ADDR);
+    model_cfg.crc = checksum((uint8_t*)&(model_cfg), config_switch_model_size);
+    flash_write(DEVICE_MODEL_CFG_ADDR, config_switch_model_size, (uint8_t*)&(model_cfg));
 
     device_model_init();
 }
@@ -113,9 +138,7 @@ void device_init() {
     switch_device[devi].debug_gpio.input = OFF;
     switch_device[devi].debug_gpio.output = ON;
     switch_device[devi].debug_gpio.func = AS_GPIO;
-    switch_device[devi].debug_gpio.pull = PM_PIN_PULLUP_1M;
-
-    devi++;
+    switch_device[devi++].debug_gpio.pull = PM_PIN_PULLUP_1M;
 
     /* zg301z Hobeian */
     switch_device[devi].device_en = ON;
@@ -139,7 +162,7 @@ void device_init() {
     switch_device[devi].switch_debounce = 16;
     switch_device[devi].relay_gpio.gpio = GPIO_PA1;
     switch_device[devi].relay_gpio.input = ON;
-    switch_device[devi].relay_gpio.output = ON;;
+    switch_device[devi].relay_gpio.output = ON;
     switch_device[devi].relay_gpio.func = AS_GPIO;
     switch_device[devi].relay_on = 1;
     switch_device[devi].relay_off = 0;
@@ -147,7 +170,39 @@ void device_init() {
     switch_device[devi].debug_gpio.input = OFF;
     switch_device[devi].debug_gpio.output = ON;
     switch_device[devi].debug_gpio.func = AS_GPIO;
-    switch_device[devi].debug_gpio.pull = PM_PIN_PULLUP_1M;
+    switch_device[devi++].debug_gpio.pull = PM_PIN_PULLUP_1M;
+
+    /* zg301z Hobeian mini */
+    switch_device[devi].device_en = ON;
+    switch_device[devi].button_max = 1;
+    switch_device[devi].button_gpio.gpio = GPIO_PD7;
+    switch_device[devi].button_gpio.input = ON;
+    switch_device[devi].button_gpio.output = OFF;
+    switch_device[devi].button_gpio.func = AS_GPIO;
+    switch_device[devi].button_gpio.pull = PM_PIN_PULLUP_10K;
+    switch_device[devi].led_gpio.gpio = GPIO_PD4;
+    switch_device[devi].led_gpio.input = OFF;
+    switch_device[devi].led_gpio.output = ON;
+    switch_device[devi].led_gpio.func = AS_GPIO;
+    switch_device[devi].len_on = 0;
+    switch_device[devi].len_off = 1;
+    switch_device[devi].switch_gpio.gpio = GPIO_PB6;
+    switch_device[devi].switch_gpio.input = ON;
+    switch_device[devi].switch_gpio.output = OFF;
+    switch_device[devi].switch_gpio.func = AS_GPIO;
+    switch_device[devi].switch_gpio.pull = PM_PIN_PULLUP_10K;
+    switch_device[devi].switch_debounce = 16;
+    switch_device[devi].relay_gpio.gpio = GPIO_PA1;
+    switch_device[devi].relay_gpio.input = ON;
+    switch_device[devi].relay_gpio.output = ON;
+    switch_device[devi].relay_gpio.func = AS_GPIO;
+    switch_device[devi].relay_on = 1;
+    switch_device[devi].relay_off = 0;
+    switch_device[devi].debug_gpio.gpio = UART_TX_PB1;
+    switch_device[devi].debug_gpio.input = OFF;
+    switch_device[devi].debug_gpio.output = ON;
+    switch_device[devi].debug_gpio.func = AS_GPIO;
+    switch_device[devi++].debug_gpio.pull = PM_PIN_PULLUP_1M;
 
     device_model_restore();
 }

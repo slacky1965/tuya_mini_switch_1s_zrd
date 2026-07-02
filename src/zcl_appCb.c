@@ -153,8 +153,8 @@ static void app_zclReadRspCmd(zclReadRspCmd_t *pReadRspCmd) {
             time_local |= (attrList[i].data[3] << 24) & 0xffffffff;
             zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_GEN_TIME, ZCL_ATTRID_LOCAL_TIME, (uint8_t*)&time_local);
             time_sent = true;
-#if UART_PRINTF_MODE && DEBUG_TIME
-            printf("Sync Local Time: %d\r\n", time_local+UNIX_TIME_CONST);
+#if UART_PRINTF_MODE && DEBUG_TIME_EN
+            APP_DEBUG(DEBUG_TIME_EN, "Sync Local Time: %d\r\n", time_local+UNIX_TIME_CONST);
 #endif
         }
     }
@@ -178,6 +178,8 @@ static void app_zclReadRspCmd(zclReadRspCmd_t *pReadRspCmd) {
 static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *pWriteReqCmd)
 {
 
+    //    APP_DEBUG(DEBUG_ZCL_CB_EN, "app_zclWriteReqCmd\r\n");
+
     uint8_t numAttr = pWriteReqCmd->numAttr;
     zclWriteRec_t *attr = pWriteReqCmd->attrList;
     bool save = false;
@@ -185,68 +187,123 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
     zcl_onOffCfgAttr_t *pOnOffCfg = zcl_onOffCfgAttrsGet();
     pOnOffCfg += idx;
 
-//    printf("app_zclWriteReqCmd\r\n");
+    if (epId == APP_ENDPOINT1) {
+        uint8_t idx = epId - 1;
+        zcl_onOffCfgAttr_t *pOnOffCfg = zcl_onOffCfgAttrsGet();
+        pOnOffCfg += idx;
 
-    if (clusterId == ZCL_CLUSTER_GEN_ON_OFF) {
-        for (uint32_t i = 0; i < numAttr; i++) {
-            if (attr[i].attrID == ZCL_ATTRID_START_UP_ONOFF) {
-                uint8_t startup = attr[i].attrData[0];
-//                printf("startup: 0x%02x, ep: %d\r\n", startup, epId);
-                relay_settings.startUpOnOff[idx] = startup;
-                save = true;
+        if (clusterId == ZCL_CLUSTER_GEN_ON_OFF) {
+            for (uint32_t i = 0; i < numAttr; i++) {
+                if (attr[i].attrID == ZCL_ATTRID_START_UP_ONOFF) {
+                    uint8_t startup = attr[i].attrData[0];
+#if UART_PRINTF_MODE && DEBUG_ZCL_CB_EN
+                    APP_DEBUG(DEBUG_ZCL_CB_EN, "startup: 0x%02x, ep: %d\r\n", startup, epId);
+#endif
+                    if (relay_settings.startUpOnOff[idx] != startup) {
+                        relay_settings.startUpOnOff[idx] = startup;
+                        if (startup > ZCL_START_UP_ONOFF_SET_ONOFF_TO_ON) {
+                            status_onoff_save();
+                        }
+                        save = true;
+                    }
+                }
+            }
+        } else if (clusterId == ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG) {
+            for (uint32_t i = 0; i < numAttr; i++) {
+                if (attr[i].attrID == CUSTOM_ATTRID_SWITCH_TYPE) {
+                    uint8_t type = attr[i].attrData[0];
+#if UART_PRINTF_MODE && DEBUG_ZCL_CB_EN
+                    APP_DEBUG(DEBUG_ZCL_CB_EN, "type: 0x%02x, ep: %d\r\n", type, epId);
+#endif
+                    if (type >= ZCL_SWITCH_TYPE_TOGGLE && type < ZCL_CUSTOM_SWITCH_TYPE_MAXNUM) {
+                        if (relay_settings.switchType[idx] != type) {
+                            relay_settings.switchType[idx] = type;
+                            pOnOffCfg->switchType = type;
+                            if (type >= ZCL_SWITCH_TYPE_MULTIFUNCTION) {
+                                cmdOnOff_off(epId);
+                                relay_settings.switch_decoupled[idx] = CUSTOM_SWITCH_DECOUPLED_ON;
+                                pOnOffCfg->custom_decoupled = CUSTOM_SWITCH_DECOUPLED_ON;
+                            }
+                            save = true;
+                        }
+                    }
+                } else if (attr[i].attrID == ZCL_ATTRID_SWITCH_ACTION) {
+                    uint8_t action = attr[i].attrData[0];
+#if UART_PRINTF_MODE && DEBUG_ZCL_CB_EN
+                    APP_DEBUG(DEBUG_ZCL_CB_EN, "action: 0x%02x, ep: %d\r\n", action, epId);
+#endif
+                    if (relay_settings.switchActions[idx] != action) {
+                        relay_settings.switchActions[idx] = action;
+                        save = true;
+                    }
+                } else if (attr[i].attrID == CUSTOM_ATTRID_DECOUPLED) {
+                    uint8_t decoupled = attr[i].attrData[0];
+#if UART_PRINTF_MODE && DEBUG_ZCL_CB_EN
+                    APP_DEBUG(DEBUG_ZCL_CB_EN, "decoupled: 0x%02x, ep: %d\r\n", decoupled, epId);
+#endif
+                    if (relay_settings.switch_decoupled[idx] != decoupled) {
+                        cmdOnOff_off(epId);
+                        if (decoupled == CUSTOM_SWITCH_DECOUPLED_OFF && relay_settings.switchType[idx] >= ZCL_SWITCH_TYPE_MULTIFUNCTION) {
+                            decoupled = CUSTOM_SWITCH_DECOUPLED_ON;
+                            pOnOffCfg->custom_decoupled = decoupled;
+//                        app_forcedReport(epId, clusterId, CUSTOM_ATTRID_DECOUPLED);
+                        }
+                        relay_settings.switch_decoupled[idx] = decoupled;
+                        save = true;
+                    }
+                }
             }
         }
-    } else if (clusterId == ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG) {
-        for (uint32_t i = 0; i < numAttr; i++) {
-            if (attr[i].attrID == CUSTOM_ATTRID_SWITCH_TYPE) {
-                uint8_t type = attr[i].attrData[0];
-//                printf("type: 0x%02x\r\n", type);
-                relay_settings.switchType[idx] = type;
-                pOnOffCfg->switchType = type;
-                if (type == ZCL_SWITCH_TYPE_MULTIFUNCTION) {
-                    cmdOnOff_off(epId);
-                    relay_settings.switch_decoupled[idx] = CUSTOM_SWITCH_DECOUPLED_ON;
-                    pOnOffCfg->custom_decoupled = CUSTOM_SWITCH_DECOUPLED_ON;
+
+        if (clusterId == ZCL_CLUSTER_GEN_LEVEL_CONTROL) {
+            for (u8 i = 0; i < numAttr; i++) {
+                if (attr[i].attrID == ZCL_ATTRID_LEVEL_DEFAULT_MOVE_RATE) {
+                    uint8_t rate = attr[i].attrData[0];
+#if UART_PRINTF_MODE && DEBUG_ZCL_CB_EN
+                    APP_DEBUG(DEBUG_ZCL_CB_EN, "Level rate: 0x%02x, ep: %d\r\n", rate, epId);
+#endif
+                    relay_settings.defaultMoveRate[idx] = rate;
+                    save = true;
+                } else if (attr[i].attrID == ZCL_ATTRID_LEVEL_MIN_LEVEL) {
+                    uint8_t min = attr[i].attrData[0];
+#if UART_PRINTF_MODE && DEBUG_ZCL_CB_EN
+                    APP_DEBUG(DEBUG_ZCL_CB_EN, "Level min: %d, ep: %d\r\n", min, epId);
+#endif
+                    relay_settings.levelMin[idx] = min;
+                    save = true;
+                } else if (attr[i].attrID == ZCL_ATTRID_LEVEL_MAX_LEVEL) {
+                    uint8_t max = attr[i].attrData[0];
+#if UART_PRINTF_MODE && DEBUG_ZCL_CB_EN
+                    APP_DEBUG(DEBUG_ZCL_CB_EN, "Level max: %d, ep: %d\r\n", max, epId);
+#endif
+                    relay_settings.levelMax[idx] = max;
+                    save = true;
+                } else if (attr[i].attrID == ZCL_ATTRID_LEVEL_ON_OFF_TRANSITION_TIME) {
+                    uint16_t time = attr[i].attrData[0] & 0xff;
+                    time |= (attr[i].attrData[1] << 8) & 0xffff;
+#if UART_PRINTF_MODE && DEBUG_ZCL_CB_EN
+                    APP_DEBUG(DEBUG_ZCL_CB_EN, "Level time: %d, ep: %d\r\n", time, epId);
+#endif
+                    relay_settings.transitionTime[idx] = time;
+                    save = true;
                 }
-                save = true;
-            } else if (attr[i].attrID == ZCL_ATTRID_SWITCH_ACTION) {
-                uint8_t action = attr[i].attrData[0];
-//                printf("action: 0x%02x, ep: %d\r\n", action, epId);
-                relay_settings.switchActions[idx] = action;
-                save = true;
-            } else if (attr[i].attrID == CUSTOM_ATTRID_DECOUPLED) {
-                uint8_t decoupled = attr[i].attrData[0];
-//                printf("decoupled: 0x%02x\r\n", decoupled);
-                cmdOnOff_off(epId);
-                if (decoupled == CUSTOM_SWITCH_DECOUPLED_OFF && relay_settings.switchType[idx] == ZCL_SWITCH_TYPE_MULTIFUNCTION) {
-                    decoupled = CUSTOM_SWITCH_DECOUPLED_ON;
-                    pOnOffCfg->custom_decoupled = decoupled;
-//                    app_forcedReport(epId, clusterId, CUSTOM_ATTRID_DECOUPLED);
-                }
-                relay_settings.switch_decoupled[idx] = decoupled;
-                save = true;
-            } else if (attr[i].attrID == CUSTOM_ATTRID_DEVICE_MODEL) {
-                uint8_t model = attr[i].attrData[0];
-                if (model >= DEVICE_SWITCH_NONE && model < DEVICE_SWITCH_MAX) {
-                    device_model_save(model);
-                }
-                printf("model: 0x%02x, ep: %d\r\n", model, epId);
             }
         }
-    }
 
-    if (save) relay_settings_save();
+        if (save) relay_settings_save();
 
 #ifdef ZCL_POLL_CTRL
-    if(clusterId == ZCL_CLUSTER_GEN_POLL_CONTROL){
-        for(int32_t i = 0; i < numAttr; i++){
-            if(attr[i].attrID == ZCL_ATTRID_CHK_IN_INTERVAL){
-                app_zclCheckInStart();
-                return;
+        if(clusterId == ZCL_CLUSTER_GEN_POLL_CONTROL){
+            for(int32_t i = 0; i < numAttr; i++){
+                if(attr[i].attrID == ZCL_ATTRID_CHK_IN_INTERVAL){
+                    app_zclCheckInStart();
+                    return;
+                }
             }
         }
-    }
 #endif
+
+    }
 }
 
 /*********************************************************************
@@ -301,7 +358,6 @@ static void app_zclDfltRspCmd(zclDefaultRspCmd_t *pDftRspCmd)
 static void app_zclCfgReportCmd(uint8_t endPoint, uint16_t clusterId, zclCfgReportCmd_t *pCfgReportCmd)
 {
     //printf("app_zclCfgReportCmd\r\n");
-    reportAttrTimerStop();
 }
 
 /*********************************************************************
@@ -760,7 +816,7 @@ static int32_t checkRespTimeCb(void *arg) {
             if (count_no_service++ == 3) {
                 device_online = false;
 #if UART_PRINTF_MODE// && DEBUG_LEVEL
-                printf("No service!\r\n");
+                APP_DEBUG(DEBUG_ZCL_CB_EN, "No service!\r\n");
 #endif
             }
         } else {
@@ -771,7 +827,7 @@ static int32_t checkRespTimeCb(void *arg) {
             device_online = true;
             count_no_service = 0;
 #if UART_PRINTF_MODE// && DEBUG_LEVEL
-            printf("Device online\r\n");
+            APP_DEBUG(DEBUG_ZCL_CB_EN, "Device online\r\n");
 #endif
         }
     }
@@ -828,15 +884,21 @@ status_t app_onOffCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayloa
 #endif
             switch(cmdId){
                 case ZCL_CMD_ONOFF_ON:
-                    printf("pAddrInfo->dstEp: %d, cmd on\r\n", pAddrInfo->dstEp);
+#if UART_PRINTF_MODE && (DEBUG_ONOFF_EN || DEBUG_ZCL_CB_EN)
+                    APP_DEBUG(DEBUG_ONOFF_EN | DEBUG_ZCL_CB_EN, "pAddrInfo->dstEp: %d, cmd on\r\n", pAddrInfo->dstEp);
+#endif
                     cmdOnOff_on(pAddrInfo->dstEp);
                     break;
                 case ZCL_CMD_ONOFF_OFF:
-                    printf("pAddrInfo->dstEp: %d, cmd off\r\n", pAddrInfo->dstEp);
+#if UART_PRINTF_MODE && (DEBUG_ONOFF_EN || DEBUG_ZCL_CB_EN)
+                    APP_DEBUG(DEBUG_ONOFF_EN | DEBUG_ZCL_CB_EN, "pAddrInfo->dstEp: %d, cmd off\r\n", pAddrInfo->dstEp);
+#endif
                     cmdOnOff_off(pAddrInfo->dstEp);
                     break;
                 case ZCL_CMD_ONOFF_TOGGLE:
-                    printf("pAddrInfo->dstEp: %d, cmd toggle\r\n", pAddrInfo->dstEp);
+#if UART_PRINTF_MODE && (DEBUG_ONOFF_EN || DEBUG_ZCL_CB_EN)
+                    APP_DEBUG(DEBUG_ONOFF_EN | DEBUG_ZCL_CB_EN, "pAddrInfo->dstEp: %d, cmd toggle\r\n", pAddrInfo->dstEp);
+#endif
                     cmdOnOff_toggle(pAddrInfo->dstEp);
                     break;
 //                case ZCL_CMD_OFF_WITH_EFFECT:
@@ -877,5 +939,14 @@ status_t app_msInputCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cm
     status_t status = ZCL_STA_SUCCESS;
 
     return status;
+}
+
+status_t app_levelCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload) {
+
+#if UART_PRINTF_MODE && DEBUG_ZCL_CB_EN
+    APP_DEBUG(DEBUG_ZCL_CB_EN, "app_LevelCb\r\n");
+#endif
+
+    return ZCL_STA_SUCCESS;
 }
 

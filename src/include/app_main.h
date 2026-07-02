@@ -13,8 +13,10 @@
 
 #include "app_device.h"
 #include "app_relay.h"
+#include "app_level.h"
 #include "app_onoff.h"
 #include "app_switch.h"
+#include "zcl_custom_attr.h"
 #include "zcl_onoffSwitchCfg.h"
 #include "app_reporting.h"
 #include "app_endpoint_cfg.h"
@@ -59,6 +61,7 @@ status_t app_sceneCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdP
 status_t app_timeCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
 status_t app_onOffCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
 status_t app_msInputCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
+status_t app_levelCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
 
 void app_leaveCnfHandler(nlme_leave_cnf_t *pLeaveCnf);
 void app_leaveIndHandler(nlme_leave_ind_t *pLeaveInd);

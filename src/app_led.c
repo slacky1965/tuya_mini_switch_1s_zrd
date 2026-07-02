@@ -34,11 +34,11 @@ int32_t zclLightTimerCb(void *arg)
     uint32_t interval = 0;
 
     if(g_appCtx.sta == g_appCtx.oriSta){
-        g_appCtx.times--;
-        if(g_appCtx.times <= 0){
+        if(g_appCtx.times == 0){
             g_appCtx.timerLedEvt = NULL;
             return -1;
         }
+        g_appCtx.times--;
     }
 
     g_appCtx.sta = !g_appCtx.sta;

@@ -58,16 +58,20 @@
 #include "version_cfg.h"
 
 /* Debug mode config */
+#ifndef UART_PRINTF_MODE
 #define UART_PRINTF_MODE                ON
-#define DEBUG_SAVE	                    ON
-#define DEBUG_BUTTON                    ON
-#define DEBUG_SWITCH                    ON
-#define DEBUG_CONFIG                    ON
-#define DEBUG_ONOFF                     ON
-#define DEBUG_TIME                      OFF
-#define DEBUG_REPORTING                 OFF
-#define DEBUG_OTA                       OFF
-#define DEBUG_STA_STATUS                OFF
+#endif
+#define DEBUG_SAVE_EN                   ON
+#define DEBUG_BUTTON_EN                 ON
+#define DEBUG_SWITCH_EN                 ON
+#define DEBUG_CONFIG_EN                 ON
+#define DEBUG_ONOFF_EN                  ON
+#define DEBUG_TEST_STATUS_ONOFF_SAVE_EN OFF
+#define DEBUG_TIME_EN                   OFF
+#define DEBUG_REPORTING_EN              ON
+#define DEBUG_OTA_EN                    OFF
+#define DEBUG_ZCL_CB_EN                 ON
+#define DEBUG_STA_STATUS_EN             OFF
 
 #if UART_PRINTF_MODE
 #define DEBUG_INFO_TX_PIN       GPIO_PD1    //fake gpio for 32pin's chip
@@ -122,6 +126,9 @@
         0x34000     NV_1
         0x00000     Firmware
      */
+    #define BEGIN_STATUS_ONOFF_DATA     0x74000   // begin address for saving status onoff
+    #define END_STATUS_ONOFF_DATA       0x75000   // end address
+    #define STATUS_ONOFF_DATA_SIZE      (END_STATUS_ONOFF_DATA - BEGIN_STATUS_ONOFF_DATA)
     #define NV_ITEM_APP_USER_CFG        (NV_ITEM_APP_GP_TRANS_TABLE + 1)    // see sdk/proj/drivers/drv_nv.h
 #elif defined(MCU_CORE_8278)
     #define FLASH_CAP_SIZE_1M           1
@@ -177,6 +184,7 @@
 #define ZCL_GP_SUPPORT                              ON
 #define ZCL_TIME_SUPPORT                            ON
 #define ZCL_MULTISTATE_INPUT_SUPPORT                ON
+#define ZCL_LEVEL_CTRL_SUPPORT                      ON
 #if TOUCHLINK_SUPPORT
 #define ZCL_ZLL_COMMISSIONING_SUPPORT               ON
 #endif
